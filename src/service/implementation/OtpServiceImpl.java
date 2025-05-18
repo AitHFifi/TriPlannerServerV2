@@ -17,8 +17,8 @@ import service.OtpService;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.time.LocalDateTime;
-import java.util.Random;
 import util.EmailUtil;
+import util.OtpUtil;
 
 public class OtpServiceImpl extends UnicastRemoteObject implements OtpService {
 
@@ -29,7 +29,7 @@ public class OtpServiceImpl extends UnicastRemoteObject implements OtpService {
 
     @Override
     public boolean generateAndSendOtp(User user) throws RemoteException {
-        String code = String.format("%06d", new Random().nextInt(999999));
+        String code = OtpUtil.generateSixDigitOtp();
         Otp otp = new Otp(code, LocalDateTime.now().plusMinutes(5), false, user);
         boolean saved = otpDAO.save(otp);
         if (saved) {
