@@ -30,27 +30,51 @@ public class TripDAO {
         return list;
     }
 
-    public void save(Trip trip) {
+    public boolean save(Trip trip) {
+        Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.save(trip);
-        tx.commit();
-        session.close();
+        try {
+            tx = session.beginTransaction();
+            session.save(trip);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
-    public void update(Trip trip) {
+    public boolean update(Trip trip) {
+        Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.update(trip);
-        tx.commit();
-        session.close();
+        try {
+            tx = session.beginTransaction();
+            session.update(trip);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
-    public void delete(Trip trip) {
+    public boolean delete(Trip trip) {
+        Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.delete(trip);
-        tx.commit();
-        session.close();
+        try {
+            tx = session.beginTransaction();
+            session.delete(trip);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 }

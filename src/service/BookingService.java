@@ -17,7 +17,7 @@ import java.util.List;
 public interface BookingService extends Remote {
     Booking findById(Long id) throws RemoteException;
     List<Booking> findAll() throws RemoteException;
-    void save(Booking booking) throws RemoteException;
-    void update(Booking booking) throws RemoteException;
-    void delete(Booking booking) throws RemoteException;
+    boolean save(Booking booking) throws RemoteException;
+    boolean update(Booking booking) throws RemoteException;
+    boolean delete(Booking booking) throws RemoteException;
 }

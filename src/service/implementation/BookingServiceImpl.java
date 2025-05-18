@@ -9,43 +9,44 @@ package service.implementation;
  *
  * @author Hp
  */
+
 import dao.BookingDAO;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import model.Booking;
 import service.BookingService;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
 public class BookingServiceImpl extends UnicastRemoteObject implements BookingService {
 
-    public BookingServiceImpl() throws RemoteException{
-    super();
-    }
-    
     private BookingDAO bookingDAO = new BookingDAO();
 
+    public BookingServiceImpl() throws RemoteException {
+        super();
+    }
+
     @Override
-    public Booking findById(Long id) {
+    public Booking findById(Long id) throws RemoteException {
         return bookingDAO.findById(id);
     }
 
     @Override
-    public List<Booking> findAll() {
+    public List<Booking> findAll() throws RemoteException {
         return bookingDAO.findAll();
     }
 
     @Override
-    public void save(Booking booking) {
-        bookingDAO.save(booking);
+    public boolean save(Booking booking) throws RemoteException {
+        return bookingDAO.save(booking);
     }
 
     @Override
-    public void update(Booking booking) {
-        bookingDAO.update(booking);
+    public boolean update(Booking booking) throws RemoteException {
+        return bookingDAO.update(booking);
     }
 
     @Override
-    public void delete(Booking booking) {
-        bookingDAO.delete(booking);
+    public boolean delete(Booking booking) throws RemoteException {
+        return bookingDAO.delete(booking);
     }
 }

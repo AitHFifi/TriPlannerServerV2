@@ -17,7 +17,7 @@ import java.util.List;
 public interface DestinationService extends Remote{
     Destination findById(Long id) throws RemoteException;
     List<Destination> findAll() throws RemoteException;
-    void save(Destination destination) throws RemoteException;
-    void update(Destination destination) throws RemoteException;
-    void delete(Destination destination) throws RemoteException;
+    boolean save(Destination destination) throws RemoteException;
+    boolean update(Destination destination) throws RemoteException;
+    boolean delete(Destination destination) throws RemoteException;
 }

@@ -17,9 +17,9 @@ import java.util.List;
 public interface UserService extends Remote{
     User findById(Long id) throws RemoteException;
     List<User> findAll() throws RemoteException;
-    void save(User user) throws RemoteException;
-    void update(User user) throws RemoteException;
-    void delete(User user) throws RemoteException;
+    boolean save(User user) throws RemoteException;
+    boolean update(User user) throws RemoteException;
+    boolean delete(User user) throws RemoteException;
     User findByUsername(String username) throws RemoteException;
     User findByEmail(String email) throws RemoteException;
 }

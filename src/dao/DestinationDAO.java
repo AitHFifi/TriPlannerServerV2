@@ -30,27 +30,51 @@ public class DestinationDAO {
         return list;
     }
 
-    public void save(Destination destination) {
+    public boolean save(Destination destination) {
+        Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.save(destination);
-        tx.commit();
-        session.close();
+        try {
+            tx = session.beginTransaction();
+            session.save(destination);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
-    public void update(Destination destination) {
+    public boolean update(Destination destination) {
+        Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.update(destination);
-        tx.commit();
-        session.close();
+        try {
+            tx = session.beginTransaction();
+            session.update(destination);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
-    public void delete(Destination destination) {
+    public boolean delete(Destination destination) {
+        Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.delete(destination);
-        tx.commit();
-        session.close();
+        try {
+            tx = session.beginTransaction();
+            session.delete(destination);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 }

@@ -9,15 +9,11 @@ package service;
  *
  * @author Hp
  */
+import model.User;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import model.Otp;
-import java.util.List;
 
-public interface OtpService extends Remote{
-    Otp findById(Long id) throws RemoteException;
-    List<Otp> findAll() throws RemoteException;
-    void save(Otp otp) throws RemoteException;
-    void update(Otp otp) throws RemoteException;
-    void delete(Otp otp) throws RemoteException;
+public interface OtpService extends Remote {
+    boolean generateAndSendOtp(User user) throws RemoteException;
+    boolean verifyOtp(User user, String code) throws RemoteException;
 }

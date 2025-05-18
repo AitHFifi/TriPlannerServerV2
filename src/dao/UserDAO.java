@@ -31,28 +31,52 @@ public class UserDAO {
         return list;
     }
 
-    public void save(User user) {
+    public boolean save(User user) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.save(user);
-        tx.commit();
-        session.close();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.save(user);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
-    public void update(User user) {
+    public boolean update(User user) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.update(user);
-        tx.commit();
-        session.close();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.update(user);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
-    public void delete(User user) {
+    public boolean delete(User user) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.delete(user);
-        tx.commit();
-        session.close();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.delete(user);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
     public User findByUsername(String username) {

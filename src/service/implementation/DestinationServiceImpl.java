@@ -10,42 +10,43 @@ package service.implementation;
  * @author Hp
  */
 import dao.DestinationDAO;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import model.Destination;
 import service.DestinationService;
+
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
 public class DestinationServiceImpl extends UnicastRemoteObject implements DestinationService {
 
-    public DestinationServiceImpl() throws RemoteException{
-    super();
-    }
-    
     private DestinationDAO destinationDAO = new DestinationDAO();
 
+    public DestinationServiceImpl() throws RemoteException {
+        super();
+    }
+
     @Override
-    public Destination findById(Long id) {
+    public Destination findById(Long id) throws RemoteException {
         return destinationDAO.findById(id);
     }
 
     @Override
-    public List<Destination> findAll() {
+    public List<Destination> findAll() throws RemoteException {
         return destinationDAO.findAll();
     }
 
     @Override
-    public void save(Destination destination) {
-        destinationDAO.save(destination);
+    public boolean save(Destination destination) throws RemoteException {
+        return destinationDAO.save(destination);
     }
 
     @Override
-    public void update(Destination destination) {
-        destinationDAO.update(destination);
+    public boolean update(Destination destination) throws RemoteException {
+        return destinationDAO.update(destination);
     }
 
     @Override
-    public void delete(Destination destination) {
-        destinationDAO.delete(destination);
+    public boolean delete(Destination destination) throws RemoteException {
+        return destinationDAO.delete(destination);
     }
 }

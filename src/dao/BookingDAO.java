@@ -30,27 +30,51 @@ public class BookingDAO {
         return list;
     }
 
-    public void save(Booking booking) {
+    public boolean save(Booking booking) {
+        Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.save(booking);
-        tx.commit();
-        session.close();
+        try {
+            tx = session.beginTransaction();
+            session.save(booking);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
-    public void update(Booking booking) {
+    public boolean update(Booking booking) {
+        Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.update(booking);
-        tx.commit();
-        session.close();
+        try {
+            tx = session.beginTransaction();
+            session.update(booking);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
-    public void delete(Booking booking) {
+    public boolean delete(Booking booking) {
+        Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.delete(booking);
-        tx.commit();
-        session.close();
+        try {
+            tx = session.beginTransaction();
+            session.delete(booking);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 }

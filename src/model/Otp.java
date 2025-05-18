@@ -9,12 +9,13 @@ package model;
  *
  * @author Hp
  */
+import java.io.Serializable;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "otp_codes")
-public class Otp {
+public class Otp implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

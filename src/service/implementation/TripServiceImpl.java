@@ -10,42 +10,43 @@ package service.implementation;
  * @author Hp
  */
 import dao.TripDAO;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import model.Trip;
 import service.TripService;
+
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
 public class TripServiceImpl extends UnicastRemoteObject implements TripService {
 
-    public TripServiceImpl() throws RemoteException{
-    super();
-    }
-    
     private TripDAO tripDAO = new TripDAO();
 
+    public TripServiceImpl() throws RemoteException {
+        super();
+    }
+
     @Override
-    public Trip findById(Long id) {
+    public Trip findById(Long id) throws RemoteException {
         return tripDAO.findById(id);
     }
 
     @Override
-    public List<Trip> findAll() {
+    public List<Trip> findAll() throws RemoteException {
         return tripDAO.findAll();
     }
 
     @Override
-    public void save(Trip trip) {
-        tripDAO.save(trip);
+    public boolean save(Trip trip) throws RemoteException {
+        return tripDAO.save(trip);
     }
 
     @Override
-    public void update(Trip trip) {
-        tripDAO.update(trip);
+    public boolean update(Trip trip) throws RemoteException {
+        return tripDAO.update(trip);
     }
 
     @Override
-    public void delete(Trip trip) {
-        tripDAO.delete(trip);
+    public boolean delete(Trip trip) throws RemoteException {
+        return tripDAO.delete(trip);
     }
 }

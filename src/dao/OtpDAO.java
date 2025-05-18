@@ -10,47 +10,61 @@ package dao;
  * @author Hp
  */
 import model.Otp;
+import model.User;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import java.util.List;
+import org.hibernate.Query;
+
+import java.time.LocalDateTime;
 
 public class OtpDAO {
 
-    public Otp findById(Long id) {
+    public boolean save(Otp otp) {
+        Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Otp otp = (Otp) session.get(Otp.class, id);
-        session.close();
-        return otp;
+        try {
+            tx = session.beginTransaction();
+            session.save(otp);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 
-    public List<Otp> findAll() {
+    public Otp findValidOtpByUser(User user, String code) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        List<Otp> list = session.createQuery("from Otp").list();
-        session.close();
-        return list;
+        try {
+            Query query = session.createQuery(
+                "FROM Otp WHERE user = :user AND code = :code AND used = false AND expirationTime > :now"
+            );
+            query.setParameter("user", user);
+            query.setParameter("code", code);
+            query.setParameter("now", LocalDateTime.now());
+            Otp otp = (Otp) query.uniqueResult();
+            return otp;
+        } finally {
+            session.close();
+        }
     }
 
-    public void save(Otp otp) {
+    public boolean markOtpAsUsed(Otp otp) {
+        Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.save(otp);
-        tx.commit();
-        session.close();
-    }
-
-    public void update(Otp otp) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.update(otp);
-        tx.commit();
-        session.close();
-    }
-
-    public void delete(Otp otp) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        session.delete(otp);
-        tx.commit();
-        session.close();
+        try {
+            tx = session.beginTransaction();
+            otp.setUsed(true);
+            session.update(otp);
+            tx.commit();
+            return true;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            return false;
+        } finally {
+            session.close();
+        }
     }
 }

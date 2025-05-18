@@ -10,42 +10,41 @@ package service.implementation;
  * @author Hp
  */
 import dao.OtpDAO;
+import model.Otp;
+import model.User;
+import service.OtpService;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import model.Otp;
-import service.OtpService;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Random;
 
 public class OtpServiceImpl extends UnicastRemoteObject implements OtpService {
 
-    public OtpServiceImpl() throws RemoteException{
-    super();
-    }
-    
-    private OtpDAO otpDAO = new OtpDAO();
+    private final OtpDAO otpDAO = new OtpDAO();
+
+    public OtpServiceImpl() throws RemoteException {}
 
     @Override
-    public Otp findById(Long id) {
-        return otpDAO.findById(id);
-    }
-
-    @Override
-    public List<Otp> findAll() {
-        return otpDAO.findAll();
-    }
-
-    @Override
-    public void save(Otp otp) {
-        otpDAO.save(otp);
+    public boolean generateAndSendOtp(User user) throws RemoteException {
+        String code = String.format("%06d", new Random().nextInt(999999));
+        Otp otp = new Otp(code, LocalDateTime.now().plusMinutes(5), false, user);
+        boolean saved = otpDAO.save(otp);
+        if (saved) {
+            // Replace with real email sender
+            System.out.println("Sent OTP " + code + " to " + user.getEmail());
+        }
+        return saved;
     }
 
     @Override
-    public void update(Otp otp) {
-        otpDAO.update(otp);
-    }
-
-    @Override
-    public void delete(Otp otp) {
-        otpDAO.delete(otp);
+    public boolean verifyOtp(User user, String code) throws RemoteException {
+        Otp otp = otpDAO.findValidOtpByUser(user, code);
+        if (otp != null) {
+            otpDAO.markOtpAsUsed(otp);
+            user.setVerified(true);
+            // You should update user in UserDAO here
+            return true;
+        }
+        return false;
     }
 }

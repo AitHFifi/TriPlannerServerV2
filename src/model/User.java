@@ -1,25 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model;
 
 /**
  *
  * @author Hp
  */
-
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -27,14 +28,21 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String birthdate;
+
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true)
-    private String phone;
+    @Column(unique = true, nullable = false)
+    private String phoneNumber;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Profile profile;
+    @Column(nullable = false)
+    private String gender;
+
+    // Added for email verification
+    @Column(nullable = false)
+    private boolean verified = false;
 
     @ManyToMany
     @JoinTable(
@@ -47,21 +55,29 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Booking> bookings = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Otp> otps = new HashSet<>();
 
     // Constructors, getters, setters
 
-    public User() {
-    }
+    public User() {}
 
-    public User(Long id, String username, String password, String email, String phone, Profile profile) {
+    public User(Long id, String firstName, String lastName, String username, String password, String birthdate,
+                String phoneNumber, String gender, String email, boolean verified) {
         this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.username = username;
         this.password = password;
+        this.birthdate = birthdate;
+        this.phoneNumber = phoneNumber;
+        this.gender = gender;
         this.email = email;
-        this.phone = phone;
-        this.profile = profile;
+        this.verified = verified;
+    }
+
+    public User(Long id) {
+        this.id = id;
     }
 
     public Long getId() {
@@ -70,6 +86,22 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getUsername() {
@@ -88,28 +120,36 @@ public class User {
         this.password = password;
     }
 
+    public String getBirthdate() {
+        return birthdate;
+    }
+
+    public void setBirthdate(String birthdate) {
+        this.birthdate = birthdate;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public Profile getProfile() {
-        return profile;
-    }
-
-    public void setProfile(Profile profile) {
-        this.profile = profile;
     }
 
     public Set<Trip> getTrips() {
@@ -135,6 +175,13 @@ public class User {
     public void setOtps(Set<Otp> otps) {
         this.otps = otps;
     }
-    
-    
+
+    // Getter and setter for verified
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
 }

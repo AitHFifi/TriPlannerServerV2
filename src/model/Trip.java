@@ -9,6 +9,7 @@ package model;
  *
  * @author Hp
  */
+import java.io.Serializable;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -16,7 +17,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "trips")
-public class Trip {
+public class Trip implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

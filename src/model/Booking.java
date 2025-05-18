@@ -9,12 +9,13 @@ package model;
  *
  * @author Hp
  */
+import java.io.Serializable;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bookings")
-public class Booking {
+public class Booking implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
