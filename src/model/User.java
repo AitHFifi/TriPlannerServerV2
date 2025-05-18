@@ -39,8 +39,7 @@ public class User implements Serializable {
 
     @Column(nullable = false)
     private String gender;
-
-    // Added for email verification
+    
     @Column(nullable = false)
     private boolean verified = false;
 
@@ -175,8 +174,7 @@ public class User implements Serializable {
     public void setOtps(Set<Otp> otps) {
         this.otps = otps;
     }
-
-    // Getter and setter for verified
+    
     public boolean isVerified() {
         return verified;
     }
