@@ -18,6 +18,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.time.LocalDateTime;
 import java.util.Random;
+import util.EmailUtil;
 
 public class OtpServiceImpl extends UnicastRemoteObject implements OtpService {
 
@@ -32,8 +33,8 @@ public class OtpServiceImpl extends UnicastRemoteObject implements OtpService {
         Otp otp = new Otp(code, LocalDateTime.now().plusMinutes(5), false, user);
         boolean saved = otpDAO.save(otp);
         if (saved) {
-            // Replace with real email sender
-            System.out.println("Sent OTP " + code + " to " + user.getEmail());
+             // Use email utility to send the OTP
+            EmailUtil.sendOtpEmail(user.getEmail(), code);
         }
         return saved;
     }
