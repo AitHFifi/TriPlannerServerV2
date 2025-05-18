@@ -43,6 +43,8 @@ public class User implements Serializable {
     @Column(nullable = false)
     private boolean verified = false;
 
+    public static final long serialVersionUID = 7949221528279108760L;
+
     @ManyToMany
     @JoinTable(
         name = "user_trip",
