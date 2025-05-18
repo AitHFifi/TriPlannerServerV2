@@ -22,4 +22,5 @@ public interface UserService extends Remote{
     boolean delete(User user) throws RemoteException;
     User findByUsername(String username) throws RemoteException;
     User findByEmail(String email) throws RemoteException;
+    User register(User user) throws RemoteException;
 }

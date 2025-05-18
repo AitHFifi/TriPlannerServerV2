@@ -10,6 +10,7 @@ package service.implementation;
  * @author Hp
  */
 import dao.OtpDAO;
+import dao.UserDAO;
 import model.Otp;
 import model.User;
 import service.OtpService;
@@ -21,6 +22,7 @@ import java.util.Random;
 public class OtpServiceImpl extends UnicastRemoteObject implements OtpService {
 
     private final OtpDAO otpDAO = new OtpDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     public OtpServiceImpl() throws RemoteException {}
 
@@ -42,7 +44,7 @@ public class OtpServiceImpl extends UnicastRemoteObject implements OtpService {
         if (otp != null) {
             otpDAO.markOtpAsUsed(otp);
             user.setVerified(true);
-            // You should update user in UserDAO here
+            userDAO.update(user); // <-- persist the verified status!
             return true;
         }
         return false;

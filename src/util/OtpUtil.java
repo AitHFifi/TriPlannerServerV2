@@ -12,9 +12,18 @@ package util;
 import java.security.SecureRandom;
 
 public class OtpUtil {
-    public static String generateOtp() {
-        SecureRandom random = new SecureRandom();
-        int otp = 100000 + random.nextInt(900000); 
-        return String.valueOf(otp);
+    private static final SecureRandom secureRandom = new SecureRandom();
+
+    public static String generateOtpCode(int length) {
+        StringBuilder otp = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            otp.append(secureRandom.nextInt(10)); // 0-9
+        }
+        return otp.toString();
+    }
+
+    // Convenience method for 6-digit OTPs
+    public static String generateSixDigitOtp() {
+        return generateOtpCode(6);
     }
 }
