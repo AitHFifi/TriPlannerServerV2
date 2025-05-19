@@ -9,6 +9,7 @@ import service.implementation.UserServiceImpl;
 import service.implementation.TripServiceImpl;
 import service.implementation.DestinationServiceImpl;
 import service.implementation.BookingServiceImpl;
+import service.implementation.ExpenseServiceImpl;
 import service.implementation.OtpServiceImpl;
 
 /**
@@ -25,6 +26,7 @@ public class Server {
             theRegistry.rebind("destination", new DestinationServiceImpl());
             theRegistry.rebind("booking", new BookingServiceImpl());
             theRegistry.rebind("otp", new OtpServiceImpl());
+            theRegistry.rebind("expense", new ExpenseServiceImpl());
             System.out.println("Server is running on port 5000");
             Thread.currentThread().join();
         } catch(Exception ex) {

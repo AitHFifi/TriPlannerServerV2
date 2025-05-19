@@ -23,4 +23,9 @@ public interface UserService extends Remote{
     User findByUsername(String username) throws RemoteException;
     User findByEmail(String email) throws RemoteException;
     User register(User user) throws RemoteException;
+    boolean sendPasswordResetOtp(String email) throws RemoteException;
+    String login(String identifier, String password) throws RemoteException; // identifier = username OR email
+    void logout(String sessionToken) throws RemoteException;
+    User getCurrentUser(String sessionToken) throws RemoteException;
+    boolean updatePassword(String sessionToken, String newPassword) throws RemoteException;
 }

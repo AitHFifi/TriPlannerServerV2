@@ -13,13 +13,11 @@ import model.Otp;
 import model.User;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.Query;
-
 import java.time.LocalDateTime;
 
 public class OtpDAO {
 
-    public boolean save(Otp otp) {
+     public boolean save(Otp otp) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
@@ -35,23 +33,20 @@ public class OtpDAO {
         }
     }
 
-    public Otp findValidOtpByUser(User user, String code) {
+    // New: Find valid OTP by user, code, and purpose
+    public Otp findValidOtpByUserAndPurpose(User user, String code, String purpose) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        try {
-            Query query = session.createQuery(
-                "FROM Otp WHERE user = :user AND code = :code AND used = false AND expirationTime > :now"
-            );
-            query.setParameter("user", user);
-            query.setParameter("code", code);
-            query.setParameter("now", LocalDateTime.now());
-            Otp otp = (Otp) query.uniqueResult();
-            return otp;
-        } finally {
-            session.close();
-        }
+        Otp otp = (Otp) session.createQuery("FROM Otp WHERE user = :user AND code = :code AND purpose = :purpose AND used = false AND expirationTime > :now")
+                .setParameter("user", user)
+                .setParameter("code", code)
+                .setParameter("purpose", purpose)
+                .setParameter("now", LocalDateTime.now())
+                .uniqueResult();
+        session.close();
+        return otp;
     }
 
-    public boolean markOtpAsUsed(Otp otp) {
+    public void markOtpAsUsed(Otp otp) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
@@ -59,10 +54,8 @@ public class OtpDAO {
             otp.setUsed(true);
             session.update(otp);
             tx.commit();
-            return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            return false;
         } finally {
             session.close();
         }

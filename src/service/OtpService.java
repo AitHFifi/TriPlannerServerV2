@@ -14,6 +14,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface OtpService extends Remote {
-    boolean generateAndSendOtp(User user) throws RemoteException;
-    boolean verifyOtp(User user, String code) throws RemoteException;
+    boolean generateAndSendOtp(User user, String purpose) throws RemoteException;
+    boolean verifyOtp(User user, String code, String purpose) throws RemoteException;
 }

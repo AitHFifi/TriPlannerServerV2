@@ -14,11 +14,10 @@ import javax.mail.*;
 import javax.mail.internet.*;
 
 public class EmailUtil {
-    // Replace with you email (Gmail) and put the app password not your main password.
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587"; 
-    private static final String SENDER_EMAIL = "";
-    private static final String SENDER_PASSWORD = ""; 
+    private static final String SENDER_EMAIL = "alloghofrederic9@gmail.com";
+    private static final String SENDER_PASSWORD = "ilfk nmny rxda rjfc"; 
 
     public static boolean sendOtpEmail(String recipientEmail, String otpCode) {
         Properties props = new Properties();

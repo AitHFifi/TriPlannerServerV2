@@ -11,95 +11,58 @@ package model;
  */
 import java.io.Serializable;
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "trips")
 public class Trip implements Serializable {
+    public static final long serialVersionUID = 1L;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "trip_id", unique = true, nullable = false)
+    private String tripId; // Custom ID e.g., "TRIP-1745580288508"
 
+    @Column(nullable = false)
     private String tripName;
-    private LocalDate startDate;
-    private LocalDate endDate;
 
-    @ManyToMany(mappedBy = "trips")
-    private Set<User> users = new HashSet<>();
+    @Column(nullable = false)
+    private String startDate;
 
-    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL)
-    private Set<Destination> destinations = new HashSet<>();
+    @Column(nullable = false)
+    private String endDate;
 
-    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL)
-    private Set<Booking> bookings = new HashSet<>();
+    @Column(nullable = false)
+    private double budget; // Budget to be used by the system, cannot be exceeded
 
-    public Trip() {
-    
-    }
+    @OneToOne(mappedBy = "trip", cascade = CascadeType.ALL)
+    private Destination destination;
 
-    public Trip(String tripName, LocalDate startDate, LocalDate endDate) {
+    // Constructors
+    public Trip() {}
+
+    public Trip(String tripId, String tripName, String startDate, String endDate, double budget) {
+        this.tripId = tripId;
         this.tripName = tripName;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.budget = budget;
     }
 
-    public Long getId() {
-        return id;
-    }
+    // Getters and setters
+    public String getTripId() { return tripId; }
+    public void setTripId(String tripId) { this.tripId = tripId; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getTripName() { return tripName; }
+    public void setTripName(String tripName) { this.tripName = tripName; }
 
-    public String getTripName() {
-        return tripName;
-    }
+    public String getStartDate() { return startDate; }
+    public void setStartDate(String startDate) { this.startDate = startDate; }
 
-    public void setTripName(String tripName) {
-        this.tripName = tripName;
-    }
+    public String getEndDate() { return endDate; }
+    public void setEndDate(String endDate) { this.endDate = endDate; }
 
-    public LocalDate getStartDate() {
-        return startDate;
-    }
+    public double getBudget() { return budget; }
+    public void setBudget(double budget) { this.budget = budget; }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
-
-    public Set<Destination> getDestinations() {
-        return destinations;
-    }
-
-    public void setDestinations(Set<Destination> destinations) {
-        this.destinations = destinations;
-    }
-
-    public Set<Booking> getBookings() {
-        return bookings;
-    }
-
-    public void setBookings(Set<Booking> bookings) {
-        this.bookings = bookings;
-    }
-
-    
+    public Destination getDestination() { return destination; }
+    public void setDestination(Destination destination) { this.destination = destination; }
 }

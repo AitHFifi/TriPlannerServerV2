@@ -14,11 +14,12 @@ import dao.UserDAO;
 import model.Otp;
 import model.User;
 import service.OtpService;
+import util.EmailUtil;
+import util.OtpUtil;
+
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.time.LocalDateTime;
-import util.EmailUtil;
-import util.OtpUtil;
 
 public class OtpServiceImpl extends UnicastRemoteObject implements OtpService {
 
@@ -28,26 +29,31 @@ public class OtpServiceImpl extends UnicastRemoteObject implements OtpService {
     public OtpServiceImpl() throws RemoteException {}
 
     @Override
-    public boolean generateAndSendOtp(User user) throws RemoteException {
+    public boolean generateAndSendOtp(User user, String purpose) throws RemoteException {
         String code = OtpUtil.generateSixDigitOtp();
-        Otp otp = new Otp(code, LocalDateTime.now().plusMinutes(5), false, user);
+        Otp otp = new Otp(code, LocalDateTime.now().plusMinutes(5), false, purpose, user);
         boolean saved = otpDAO.save(otp);
         if (saved) {
-             // Use email utility to send the OTP
+            // Use email utility to send the OTP
             EmailUtil.sendOtpEmail(user.getEmail(), code);
         }
         return saved;
     }
 
-    @Override
-    public boolean verifyOtp(User user, String code) throws RemoteException {
-        Otp otp = otpDAO.findValidOtpByUser(user, code);
-        if (otp != null) {
-            otpDAO.markOtpAsUsed(otp);
+   @Override
+public boolean verifyOtp(User user, String code, String purpose) throws RemoteException {
+    Otp otp = otpDAO.findValidOtpByUserAndPurpose(user, code, purpose);
+    if (otp != null) {
+        otpDAO.markOtpAsUsed(otp);
+
+        // If this OTP is for registration, mark the user as verified and persist it
+        if ("REGISTER".equalsIgnoreCase(purpose)) {
             user.setVerified(true);
-            userDAO.update(user); // <-- persist the verified status!
-            return true;
+            userDAO.update(user); // Make sure userDAO.update persists the isVerified flag
         }
-        return false;
+
+        return true;
     }
+    return false;
+}
 }

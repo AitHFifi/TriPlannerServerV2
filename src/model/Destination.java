@@ -15,55 +15,55 @@ import javax.persistence.*;
 @Entity
 @Table(name = "destinations")
 public class Destination implements Serializable {
+    public static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "destination_id")
+    private Long destinationId;
 
-    private String location;
-    private String description;
-
-    @ManyToOne
-    @JoinColumn(name = "trip_id")
+    @OneToOne
+    @JoinColumn(name = "trip_id", referencedColumnName = "trip_id")
     private Trip trip;
+
+    @Column(nullable = false)
+    private String country;
+
+    @Column(nullable = false)
+    private String city;
+
+    @Column(nullable = false)
+    private String transportMode;
+
+    @Column(nullable = false)
+    private String description;
 
     public Destination() {}
 
-    public Destination(String location, String description, Trip trip) {
-        this.location = location;
-        this.description = description;
+    public Destination(Trip trip, String country, String city, String transportMode, String description) {
         this.trip = trip;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
+        this.country = country;
+        this.city = city;
+        this.transportMode = transportMode;
         this.description = description;
     }
 
-    public Trip getTrip() {
-        return trip;
-    }
+    // Getters and setters
+    public Long getDestinationId() { return destinationId; }
+    public void setDestinationId(Long destinationId) { this.destinationId = destinationId; }
 
-    public void setTrip(Trip trip) {
-        this.trip = trip;
-    }
-    
+    public Trip getTrip() { return trip; }
+    public void setTrip(Trip trip) { this.trip = trip; }
+
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
+    public String getTransportMode() { return transportMode; }
+    public void setTransportMode(String transportMode) { this.transportMode = transportMode; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }

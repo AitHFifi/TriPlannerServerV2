@@ -9,33 +9,34 @@ package dao;
  *
  * @author Hp
  */
+import model.Expense;
 import model.Trip;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import java.util.List;
 
-public class TripDAO {
+public class ExpenseDAO {
 
-    public Trip findById(Long id) {
+    public Expense findById(Long id) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Trip trip = (Trip) session.get(Trip.class, id);
+        Expense expense = (Expense) session.get(Expense.class, id);
         session.close();
-        return trip;
+        return expense;
     }
 
-    public List<Trip> findAll() {
+    public List<Expense> findAll() {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        List<Trip> list = session.createQuery("from Trip").list();
+        List<Expense> list = session.createQuery("from Expense").list();
         session.close();
         return list;
     }
 
-    public boolean save(Trip trip) {
+    public boolean save(Expense expense) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             tx = session.beginTransaction();
-            session.save(trip);
+            session.save(expense);
             tx.commit();
             return true;
         } catch (Exception e) {
@@ -46,12 +47,12 @@ public class TripDAO {
         }
     }
 
-    public boolean update(Trip trip) {
+    public boolean update(Expense expense) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             tx = session.beginTransaction();
-            session.update(trip);
+            session.update(expense);
             tx.commit();
             return true;
         } catch (Exception e) {
@@ -62,12 +63,12 @@ public class TripDAO {
         }
     }
 
-    public boolean delete(Trip trip) {
+    public boolean delete(Expense expense) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             tx = session.beginTransaction();
-            session.delete(trip);
+            session.delete(expense);
             tx.commit();
             return true;
         } catch (Exception e) {
@@ -76,32 +77,40 @@ public class TripDAO {
         } finally {
             session.close();
         }
+    }
+
+    public List<Expense> findByExpenseType(String expenseType) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<Expense> list = session.createQuery("from Expense where expenseType = :expenseType")
+                                    .setParameter("expenseType", expenseType)
+                                    .list();
+        session.close();
+        return list;
+    }
+
+    // New: Find all expenses for a specific trip
+    public List<Expense> findByTrip(String tripId) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        List<Expense> list = session.createQuery("from Expense where trip.tripId = :tripId")
+                                    .setParameter("tripId", tripId)
+                                    .list();
+        session.close();
+        return list;
+    }
+
+    // New: Sum all expenses for a specific trip
+    public double sumExpensesByTrip(String tripId) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Double sum = (Double) session.createQuery("select sum(amount) from Expense where trip.tripId = :tripId")
+                                     .setParameter("tripId", tripId)
+                                     .uniqueResult();
+        session.close();
+        return sum != null ? sum : 0.0;
     }
     
-        public long countAll() {
+    public double sumAll() {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        long count = (Long) session.createQuery("select count(t) from Trip t").uniqueResult();
-        session.close();
-        return count;
-    }
-
-    public long countUpcoming() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        long count = (Long) session.createQuery("select count(t) from Trip t where t.startDate > current_date").uniqueResult();
-        session.close();
-        return count;
-    }
-
-    public long countCompleted() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        long count = (Long) session.createQuery("select count(t) from Trip t where t.endDate < current_date").uniqueResult();
-        session.close();
-        return count;
-    }
-
-    public double sumBudgets() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Double sum = (Double) session.createQuery("select sum(t.budget) from Trip t").uniqueResult();
+        Double sum = (Double) session.createQuery("select sum(e.amount) from Expense e").uniqueResult();
         session.close();
         return sum != null ? sum : 0.0;
     }

@@ -23,6 +23,8 @@ public class Otp implements Serializable {
     private String code;
     private LocalDateTime expirationTime;
     private boolean used;
+    @Column(nullable = false)
+    private String purpose; // e.g. "REGISTER", "RESET_PASSWORD"
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -30,10 +32,11 @@ public class Otp implements Serializable {
 
     public Otp() {}
 
-    public Otp(String code, LocalDateTime expirationTime, boolean used, User user) {
+     public Otp(String code, LocalDateTime expirationTime, boolean used, String purpose, User user) {
         this.code = code;
         this.expirationTime = expirationTime;
         this.used = used;
+        this.purpose = purpose;
         this.user = user;
     }
 
@@ -43,6 +46,14 @@ public class Otp implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
     }
 
     public String getCode() {

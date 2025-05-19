@@ -53,5 +53,6 @@ Contributor(s):
     <mapping class="model.Otp"/>
     <mapping class="model.Trip"/>
     <mapping class="model.User"/>
+    <mapping class="model.Expense"/>
   </session-factory>
 </hibernate-configuration>

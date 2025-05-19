@@ -77,4 +77,20 @@ public class BookingDAO {
             session.close();
         }
     }
+    
+    public long countAll() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        long count = (Long) session.createQuery("select count(b) from Booking b").uniqueResult();
+        session.close();
+        return count;
+    }
+
+    public long countPending() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        long count = (Long) session.createQuery("select count(b) from Booking b where b.status = :status")
+                                  .setParameter("status", "pending")
+                                  .uniqueResult();
+        session.close();
+        return count;
+    }
 }

@@ -7,6 +7,7 @@ package model;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -53,8 +54,8 @@ public class User implements Serializable {
     )
     private Set<Trip> trips = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Booking> bookings = new HashSet<>();
+    @OneToMany(mappedBy = "user")
+    private List<Booking> bookings;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Otp> otps = new HashSet<>();
@@ -161,12 +162,12 @@ public class User implements Serializable {
         this.trips = trips;
     }
 
-    public Set<Booking> getBookings() {
-        return bookings;
+    public List<Booking> getBookings() { 
+        return bookings; 
     }
-
-    public void setBookings(Set<Booking> bookings) {
-        this.bookings = bookings;
+    
+    public void setBookings(List<Booking> bookings) { 
+        this.bookings = bookings; 
     }
 
     public Set<Otp> getOtps() {
