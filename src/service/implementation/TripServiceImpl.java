@@ -26,7 +26,7 @@ public class TripServiceImpl extends UnicastRemoteObject implements TripService 
     }
 
     @Override
-    public Trip findById(Long id) throws RemoteException {
+    public Trip findTripsByUser(Long id) throws RemoteException {
         return tripDAO.findById(id);
     }
 
@@ -36,17 +36,18 @@ public class TripServiceImpl extends UnicastRemoteObject implements TripService 
     }
 
     @Override
-    public boolean save(Trip trip) throws RemoteException {
+    public Trip save(Trip trip) throws RemoteException {
         return tripDAO.save(trip);
     }
 
     @Override
-    public boolean update(Trip trip) throws RemoteException {
+    public Trip update(Trip trip) throws RemoteException {
         return tripDAO.update(trip);
     }
 
     @Override
-    public boolean delete(Trip trip) throws RemoteException {
-        return tripDAO.delete(trip);
+    public void delete(Trip trip) throws RemoteException {
+        
     }
+    
 }

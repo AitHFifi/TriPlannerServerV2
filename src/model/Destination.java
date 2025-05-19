@@ -1,17 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model;
+
+import java.io.Serializable;
+import java.util.List;
+import javax.persistence.*;
 
 /**
  *
  * @author Hp
  */
-import java.io.Serializable;
-import javax.persistence.*;
-
 @Entity
 @Table(name = "destinations")
 public class Destination implements Serializable {
@@ -21,10 +17,6 @@ public class Destination implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "destination_id")
     private Long destinationId;
-
-    @OneToOne
-    @JoinColumn(name = "trip_id", referencedColumnName = "trip_id")
-    private Trip trip;
 
     @Column(nullable = false)
     private String country;
@@ -38,32 +30,65 @@ public class Destination implements Serializable {
     @Column(nullable = false)
     private String description;
 
+    // Many-to-Many: Destination <-> Trip
+    @ManyToMany(mappedBy = "destinations", fetch = FetchType.LAZY)
+    private List<Trip> trips;
+
     public Destination() {}
 
-    public Destination(Trip trip, String country, String city, String transportMode, String description) {
-        this.trip = trip;
+    public Destination(String country, String city, String transportMode, String description, List<Trip> trips) {
         this.country = country;
         this.city = city;
         this.transportMode = transportMode;
         this.description = description;
+        this.trips = trips;
     }
 
-    // Getters and setters
-    public Long getDestinationId() { return destinationId; }
-    public void setDestinationId(Long destinationId) { this.destinationId = destinationId; }
+    public Long getDestinationId() {
+        return destinationId;
+    }
 
-    public Trip getTrip() { return trip; }
-    public void setTrip(Trip trip) { this.trip = trip; }
+    public void setDestinationId(Long destinationId) {
+        this.destinationId = destinationId;
+    }
 
-    public String getCountry() { return country; }
-    public void setCountry(String country) { this.country = country; }
+    public String getCountry() {
+        return country;
+    }
 
-    public String getCity() { return city; }
-    public void setCity(String city) { this.city = city; }
+    public void setCountry(String country) {
+        this.country = country;
+    }
 
-    public String getTransportMode() { return transportMode; }
-    public void setTransportMode(String transportMode) { this.transportMode = transportMode; }
+    public String getCity() {
+        return city;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getTransportMode() {
+        return transportMode;
+    }
+
+    public void setTransportMode(String transportMode) {
+        this.transportMode = transportMode;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<Trip> getTrips() {
+        return trips;
+    }
+
+    public void setTrips(List<Trip> trips) {
+        this.trips = trips;
+    }
 }

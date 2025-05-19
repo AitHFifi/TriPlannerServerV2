@@ -42,7 +42,6 @@ public class EmailUtil {
             message.setText("Your OTP code is: " + otpCode + "\n\nIf you did not request this, please ignore this email.");
 
             Transport.send(message);
-            System.out.println("OTP email sent successfully to " + recipientEmail);
             return true;
         } catch (MessagingException e) {
             e.printStackTrace();

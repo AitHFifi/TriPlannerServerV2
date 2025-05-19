@@ -1,14 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model;
 
-/**
- *
- * @author Hp
- */
 import java.io.Serializable;
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -16,23 +7,31 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "otp_codes")
 public class Otp implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 20)
     private String code;
-    private LocalDateTime expirationTime;
-    private boolean used;
+
     @Column(nullable = false)
+    private LocalDateTime expirationTime;
+
+    @Column(nullable = false)
+    private boolean used;
+
+    @Column(nullable = false, length = 32)
     private String purpose; // e.g. "REGISTER", "RESET_PASSWORD"
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Otp() {}
 
-     public Otp(String code, LocalDateTime expirationTime, boolean used, String purpose, User user) {
+    public Otp(String code, LocalDateTime expirationTime, boolean used, String purpose, User user) {
         this.code = code;
         this.expirationTime = expirationTime;
         this.used = used;
@@ -87,5 +86,4 @@ public class Otp implements Serializable {
     public void setUser(User user) {
         this.user = user;
     }
-    
 }

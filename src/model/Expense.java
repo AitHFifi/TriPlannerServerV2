@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model;
 
 import java.io.Serializable;
@@ -22,8 +17,9 @@ public class Expense implements Serializable {
     @Column(name = "expense_id")
     private Long expenseId;
 
-    @ManyToOne
-    @JoinColumn(name = "trip_id", referencedColumnName = "trip_id")
+    // Relationship: Many expenses belong to one trip (Many-to-One)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "trip_id", referencedColumnName = "trip_id", nullable = false)
     private Trip trip;
 
     @Column(nullable = false)
@@ -48,7 +44,6 @@ public class Expense implements Serializable {
         this.createdAt = createdAt;
     }
 
-    // Getters and setters
     public Long getExpenseId() { return expenseId; }
     public void setExpenseId(Long expenseId) { this.expenseId = expenseId; }
 

@@ -22,12 +22,12 @@ public class Booking implements Serializable {
     @Column(name = "booking_id")
     private Long bookingId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
-    @ManyToOne
-    @JoinColumn(name = "trip_id", referencedColumnName = "trip_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trip_id", nullable = false, unique = true)
     private Trip trip;
 
     @Column(nullable = false)

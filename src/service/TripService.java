@@ -15,9 +15,9 @@ import model.Trip;
 import java.util.List;
 
 public interface TripService extends Remote{
-    Trip findById(Long id) throws RemoteException;
+    Trip findTripsByUser(Long id) throws RemoteException;
     List<Trip> findAll() throws RemoteException;
-    boolean save(Trip trip) throws RemoteException;
-    boolean update(Trip trip) throws RemoteException;
-    boolean delete(Trip trip) throws RemoteException;
+    Trip save(Trip trip) throws RemoteException;
+    Trip update(Trip trip) throws RemoteException;
+    void delete(Trip trip) throws RemoteException;
 }
