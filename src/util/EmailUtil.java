@@ -8,35 +8,22 @@ package util;
 /**
  *
  * @author Hp
-// */
-//public class EmailUtil {
-//
-//    // Stub method for sending OTP email (replace with JavaMail in production)
-//    public static boolean sendOtpEmail(String recipientEmail, String otpCode) {
-//        // In production, use JavaMail API to send real emails.
-//        // For now, just print to console as a stub.
-//        System.out.println("Sending OTP " + otpCode + " to email: " + recipientEmail);
-//        // Simulate success
-//        return true;
-//    }
-//}
-
+ */
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.*;
 
 public class EmailUtil {
-
-    // Replace these with your SMTP server details
+    // Replace with you email (Gmail) and put the app password not your main password.
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587"; 
     private static final String SENDER_EMAIL = "";
-    private static final String SENDER_PASSWORD = ""; // Use app password, not your main password
+    private static final String SENDER_PASSWORD = ""; 
 
     public static boolean sendOtpEmail(String recipientEmail, String otpCode) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true"); // TLS
+        props.put("mail.smtp.starttls.enable", "true"); 
         props.put("mail.smtp.host", SMTP_HOST);
         props.put("mail.smtp.port", SMTP_PORT);
 
