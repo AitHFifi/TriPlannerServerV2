@@ -22,5 +22,5 @@ public interface UserService extends Remote{
     void logout(String sessionToken) throws RemoteException; // Used in the Dashboard
     User getCurrentUser(String sessionToken) throws RemoteException; // Used in the login form
     boolean updatePassword(String sessionToken, String newPassword) throws RemoteException; // Used in the reset password
-    boolean update(String sessionToken, User user) throws RemoteException; // User to modify their infos.
+//    boolean update(String sessionToken, User user) throws RemoteException; // User to modify their infos.
 }

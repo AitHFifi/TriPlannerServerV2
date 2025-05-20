@@ -31,7 +31,7 @@ public class UserDAO {
         return list;
     }
 
-    public boolean save(User user) {
+    public boolean saveUser(User user) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction tx = null;
         try {

@@ -45,7 +45,7 @@ public class UserServiceImpl extends UnicastRemoteObject implements UserService 
     @Override
 public User register(User user) throws RemoteException {
     user.setVerified(false);
-    boolean saved = userDAO.save(user);
+    boolean saved = userDAO.saveUser(user);
     if (saved) {
         try {
             // Get the remote OTP service. Adjust the lookup URL as needed for your environment.
@@ -95,9 +95,9 @@ public User register(User user) throws RemoteException {
         return false;
     }
 
-    @Override
-    public boolean update(String sessionToken, User user) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+//    @Override
+//    public boolean update(String sessionToken, User user) throws RemoteException {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//    }
 }
 
