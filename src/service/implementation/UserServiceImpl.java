@@ -16,7 +16,6 @@ import service.UserService;
 import service.OtpService;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
 import org.mindrot.jbcrypt.BCrypt;
 import session.SessionManager;
 
@@ -29,28 +28,8 @@ public class UserServiceImpl extends UnicastRemoteObject implements UserService 
     }
 
     @Override
-    public User findById(Long id) throws RemoteException {
-        return userDAO.findById(id);
-    }
-
-    @Override
-    public List<User> findAll() throws RemoteException {
-        return userDAO.findAll();
-    }
-
-    @Override
-    public boolean save(User user) throws RemoteException {
-        return userDAO.save(user);
-    }
-
-    @Override
     public boolean update(User user) throws RemoteException {
         return userDAO.update(user);
-    }
-
-    @Override
-    public boolean delete(User user) throws RemoteException {
-        return userDAO.delete(user);
     }
     
        @Override
@@ -78,23 +57,9 @@ public User register(User user) throws RemoteException {
         return user;
     }
     return null;
-}
-
-    @Override
-    public boolean sendPasswordResetOtp(String email) throws RemoteException {
-    User user = userDAO.findByEmail(email);
-    if (user == null) {
-        return false; // Or throw exception if you want to inform the client
-    }
-    try {
-        // Get the remote OTP service. Adjust the lookup URL as needed for your environment.
-        OtpService otpService = (OtpService) Naming.lookup("rmi://127.0.0.1:5000/otp");
-        return otpService.generateAndSendOtp(user, "RESET_PASSWORD");
-    } catch (Exception e) {
-        throw new RemoteException("Failed to generate/send OTP for password reset", e);
-    }
-}
-     @Override
+} 
+    
+@Override
     public String login(String identifier, String password) throws RemoteException {
         User user = null;
         // Check if identifier looks like an email
@@ -128,6 +93,11 @@ public User register(User user) throws RemoteException {
             return userDAO.update(user);
         }
         return false;
+    }
+
+    @Override
+    public boolean update(String sessionToken, User user) throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
 

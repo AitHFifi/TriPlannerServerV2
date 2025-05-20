@@ -11,8 +11,9 @@ public class Trip implements Serializable {
     public static final long serialVersionUID = 1L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "trip_id", unique = true, nullable = false)
-    private String tripId; // Custom ID, e.g., "TRIP-1745580288508"
+    private Long tripId; 
 
     @Column(nullable = false)
     private String tripName;
@@ -50,7 +51,7 @@ private List<Destination> destinations;
 
     public Trip() {}
 
-    public Trip(String tripId, String tripName, Date startDate, Date endDate, double budget, User user, List<Destination> destinations) {
+    public Trip(Long tripId, String tripName, Date startDate, Date endDate, double budget, User user, List<Destination> destinations) {
         this.tripId = tripId;
         this.tripName = tripName;
         this.startDate = startDate;
@@ -60,8 +61,8 @@ private List<Destination> destinations;
         this.destinations = destinations;
     }
 
-    public String getTripId() { return tripId; }
-    public void setTripId(String tripId) { this.tripId = tripId; }
+    public Long getTripId() { return tripId; }
+    public void setTripId(Long tripId) { this.tripId = tripId; }
 
     public String getTripName() { return tripName; }
     public void setTripName(String tripName) { this.tripName = tripName; }

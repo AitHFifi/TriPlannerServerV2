@@ -13,23 +13,11 @@ import model.Trip;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import java.util.List;
+import model.User;
 
 public class TripDAO {
 
-    public Trip findById(Long id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Trip trip = (Trip) session.get(Trip.class, id);
-        session.close();
-        return trip;
-    }
-
-    public List<Trip> findAll() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        List<Trip> list = session.createQuery("from Trip").list();
-        session.close();
-        return list;
-    }
-
+    
     public Trip save(Trip trip) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
@@ -62,15 +50,41 @@ public class TripDAO {
         }
     }
 
-    public void delete(Trip trip) {
+    public Trip delete(Trip trip) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
             tx = session.beginTransaction();
             session.delete(trip);
             tx.commit();
+            return trip;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
+            return null;
+        } finally {
+            session.close();
+        }
+    }
+    
+    // Find all trips for a given user
+    public List<Trip> findByUser(User user) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            List<Trip> trips = (List<Trip>) session.createQuery(
+    "from Trip t where t.user.id = :userId")
+    .setParameter("userId", user.getUserId())
+    .list();
+            return trips;
+        } finally {
+            session.close();
+        }
+    }
+    
+    // Find a trip by its id
+    public Trip findById(Long id) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            return (Trip) session.get(Trip.class, id);
         } finally {
             session.close();
         }

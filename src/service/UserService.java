@@ -12,20 +12,15 @@ package service;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import model.User;
-import java.util.List;
 
 public interface UserService extends Remote{
-    User findById(Long id) throws RemoteException;
-    List<User> findAll() throws RemoteException;
-    boolean save(User user) throws RemoteException;
-    boolean update(User user) throws RemoteException;
-    boolean delete(User user) throws RemoteException;
-    User findByUsername(String username) throws RemoteException;
-    User findByEmail(String email) throws RemoteException;
-    User register(User user) throws RemoteException;
-    boolean sendPasswordResetOtp(String email) throws RemoteException;
-    String login(String identifier, String password) throws RemoteException; // identifier = username OR email
-    void logout(String sessionToken) throws RemoteException;
-    User getCurrentUser(String sessionToken) throws RemoteException;
-    boolean updatePassword(String sessionToken, String newPassword) throws RemoteException;
+    boolean update(User user) throws RemoteException; // Used in the register form
+    User findByUsername(String username) throws RemoteException; // Used in the ForgotPassword
+    User findByEmail(String email) throws RemoteException; // Used in the ForgotPassword
+    User register(User user) throws RemoteException; // Used in the register form 
+    String login(String identifier, String password) throws RemoteException; // Used in the login form 
+    void logout(String sessionToken) throws RemoteException; // Used in the Dashboard
+    User getCurrentUser(String sessionToken) throws RemoteException; // Used in the login form
+    boolean updatePassword(String sessionToken, String newPassword) throws RemoteException; // Used in the reset password
+    boolean update(String sessionToken, User user) throws RemoteException; // User to modify their infos.
 }
