@@ -49,4 +49,9 @@ public class DestinationServiceImpl extends UnicastRemoteObject implements Desti
     public boolean delete(Destination destination) throws RemoteException {
         return destinationDAO.delete(destination);
     }
+
+    @Override
+    public List<Destination> findAllByUser(Long userId) throws RemoteException {
+        return destinationDAO.findAllByUser(userId);
+    }
 }

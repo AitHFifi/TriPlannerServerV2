@@ -24,23 +24,20 @@ public class Destination implements Serializable {
     @Column(nullable = false)
     private String city;
 
-    @Column(nullable = false)
-    private String transportMode;
-
-    @Column(nullable = false)
-    private String description;
-
     // Many-to-Many: Destination <-> Trip
     @ManyToMany(mappedBy = "destinations", fetch = FetchType.LAZY)
     private List<Trip> trips;
+    
+    // Many Destinations belong to One User
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id") // Assumes destinations table has a user_id foreign key
+    private User user;
 
     public Destination() {}
 
-    public Destination(String country, String city, String transportMode, String description, List<Trip> trips) {
+    public Destination(String country, String city, List<Trip> trips) {
         this.country = country;
         this.city = city;
-        this.transportMode = transportMode;
-        this.description = description;
         this.trips = trips;
     }
 
@@ -68,27 +65,19 @@ public class Destination implements Serializable {
         this.city = city;
     }
 
-    public String getTransportMode() {
-        return transportMode;
-    }
-
-    public void setTransportMode(String transportMode) {
-        this.transportMode = transportMode;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public List<Trip> getTrips() {
         return trips;
     }
 
     public void setTrips(List<Trip> trips) {
         this.trips = trips;
+    }
+    
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

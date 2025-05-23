@@ -52,6 +52,10 @@ public class User implements Serializable {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Otp> otps = new HashSet<>();
+    
+    // One-to-Many: User owns many destinations
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Destination> destinations;
 
     // Constructors, getters, setters
 
@@ -115,4 +119,7 @@ public class User implements Serializable {
 
     public boolean isVerified() { return verified; }
     public void setVerified(boolean verified) { this.verified = verified; }
+    
+    public List<Destination> getDestinations() { return destinations; }
+    public void setDestinations(List<Destination> destinations) { this.destinations = destinations; }
 }

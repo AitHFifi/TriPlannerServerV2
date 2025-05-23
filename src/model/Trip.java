@@ -27,6 +27,15 @@ public class Trip implements Serializable {
     @Column(nullable = false)
     private double budget;
 
+    @Column(name = "country")
+    private String country;
+
+    @Column(name = "city")
+    private String city;
+    
+    @Column(name = "transport_mode")
+    private String transportMode;
+    
     // Many-to-one: Trip -> User (owner/creator)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -51,14 +60,15 @@ private List<Destination> destinations;
 
     public Trip() {}
 
-    public Trip(Long tripId, String tripName, Date startDate, Date endDate, double budget, User user, List<Destination> destinations) {
-        this.tripId = tripId;
+    public Trip(String tripName, Date startDate, Date endDate, double budget, String country, String city, String transportMode, User user) {
         this.tripName = tripName;
         this.startDate = startDate;
         this.endDate = endDate;
         this.budget = budget;
+        this.country = country;
+        this.city = city;
+        this.transportMode = transportMode;
         this.user = user;
-        this.destinations = destinations;
     }
 
     public Long getTripId() { return tripId; }
@@ -78,6 +88,15 @@ private List<Destination> destinations;
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+    
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
+    public String getTransportMode() { return transportMode; }
+    public void setTransportMode(String transportMode) { this.transportMode = transportMode; }
 
     public List<Expense> getExpenses() { return expenses; }
     public void setExpenses(List<Expense> expenses) { this.expenses = expenses; }

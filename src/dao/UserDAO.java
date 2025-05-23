@@ -96,4 +96,34 @@ public class UserDAO {
         session.close();
         return user;
     }
+    
+    // Find user by username
+    public User findByExistingUsername(String username) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Query query = session.createQuery("from User where username = :username");
+        query.setParameter("username", username);
+        User user = (User) query.uniqueResult();
+        session.close();
+        return user;
+    }
+
+    // Find user by email
+    public User findByExistingEmail(String email) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Query query = session.createQuery("from User where email = :email");
+        query.setParameter("email", email);
+        User user = (User) query.uniqueResult();
+        session.close();
+        return user;
+    }
+
+    // Find user by phone number
+    public User findByPhoneNumber(String phoneNumber) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Query query = session.createQuery("from User where phoneNumber = :phoneNumber");
+        query.setParameter("phoneNumber", phoneNumber);
+        User user = (User) query.uniqueResult();
+        session.close();
+        return user;
+    }
 }

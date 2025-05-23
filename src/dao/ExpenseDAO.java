@@ -10,7 +10,6 @@ package dao;
  * @author Hp
  */
 import model.Expense;
-import model.Trip;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import java.util.List;

@@ -77,4 +77,16 @@ public class DestinationDAO {
             session.close();
         }
     }
+    
+    public List<Destination> findAllByUser(Long userId) {
+    Session session = HibernateUtil.getSessionFactory().openSession();
+    try {
+        return session.createQuery(
+            "from Destination d where d.user.userId = :userId")
+            .setParameter("userId", userId)
+            .list();
+    } finally {
+        session.close();
+    }
+}
 }

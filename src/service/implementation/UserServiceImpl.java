@@ -48,9 +48,8 @@ public User register(User user) throws RemoteException {
     boolean saved = userDAO.saveUser(user);
     if (saved) {
         try {
-            // Get the remote OTP service. Adjust the lookup URL as needed for your environment.
             OtpService otpService = (OtpService) Naming.lookup("rmi://127.0.0.1:5000/otp");
-            otpService.generateAndSendOtp(user, "REGISTER"); // Pass purpose as "REGISTER"
+            otpService.generateAndSendOtp(user, "REGISTER"); 
         } catch (Exception e) {
             throw new RemoteException("Failed to generate/send OTP", e);
         }
@@ -99,5 +98,20 @@ public User register(User user) throws RemoteException {
 //    public boolean update(String sessionToken, User user) throws RemoteException {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //    }
+
+    @Override
+    public boolean isUsernameTaken(String username) throws RemoteException {
+        return userDAO.findByExistingUsername(username) != null;
+    }
+
+    @Override
+    public boolean isEmailTaken(String email) throws RemoteException {
+        return userDAO.findByExistingEmail(email) != null;
+    }
+
+    @Override
+    public boolean isPhoneNumberTaken(String phoneNumber) throws RemoteException {
+        return userDAO.findByPhoneNumber(phoneNumber) != null;
+    }
 }
 

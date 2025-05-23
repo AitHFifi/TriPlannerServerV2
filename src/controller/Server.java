@@ -5,7 +5,7 @@
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import service.implementation.UserServiceImpl;
-//import service.implementation.TripServiceImpl;
+import service.implementation.TripServiceImpl;
 import service.implementation.DestinationServiceImpl;
 import service.implementation.BookingServiceImpl;
 import service.implementation.ExpenseServiceImpl;
@@ -17,7 +17,7 @@ public class Server {
             System.setProperty("java.rmi.server.hostname", "127.0.0.1");
             Registry theRegistry = LocateRegistry.createRegistry(5000);
             theRegistry.rebind("user", new UserServiceImpl());
-//            theRegistry.rebind("trip", new TripServiceImpl());
+            theRegistry.rebind("trip", new TripServiceImpl());
             theRegistry.rebind("destination", new DestinationServiceImpl());
             theRegistry.rebind("booking", new BookingServiceImpl());
             theRegistry.rebind("otp", new OtpServiceImpl());

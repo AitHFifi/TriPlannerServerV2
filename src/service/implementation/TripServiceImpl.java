@@ -5,12 +5,9 @@ import dao.UserDAO;
 import model.Trip;
 import model.User;
 import service.TripService;
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -19,52 +16,37 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TripServiceImpl extends UnicastRemoteObject implements TripService {
 
     private TripDAO tripDAO = new TripDAO();
-    private UserDAO userDAO = new UserDAO(); // You need to have a UserDAO for fetching users by session
-    // Simulated session store: sessionToken -> userId
-    // In production, inject or use your actual session management system
-    private static final Map<String, Long> sessionStore = new ConcurrentHashMap<>();
+    private UserDAO userDAO = new UserDAO();
 
     public TripServiceImpl() throws RemoteException {
         super();
     }
 
-    
-    private User getUserBySessionToken(String sessionToken) throws RemoteException {
-        Long userId = sessionStore.get(sessionToken);
-        if (userId == null) {
-            throw new RemoteException("Invalid or expired session token.");
-        }
-        User user = userDAO.findById(userId);
-        if (user == null) {
-            throw new RemoteException("User not found for this session.");
-        }
-        return user;
+    // Find a single trip by user ID (returns the first trip for the user or null)
+    @Override
+    public Trip findTripByUser(Long id) throws RemoteException {
+        User user = userDAO.findById(id);
+        List<Trip> trips = tripDAO.findByUser(user);
+        return (trips != null && !trips.isEmpty()) ? trips.get(0) : null;
     }
 
     @Override
-    public List<Trip> findTripsBySessionToken(String sessionToken) throws RemoteException {
-        User user = getUserBySessionToken(sessionToken);
-        return tripDAO.findByUser(user);
+    public List<Trip> findAll() throws RemoteException {
+        return tripDAO.findAll();
     }
 
     @Override
-    public Trip save(String sessionToken, Trip trip) throws RemoteException {
-        User user = getUserBySessionToken(sessionToken);
-        trip.setUser(user); // Make sure the trip is assigned to the session user
-        return tripDAO.save(trip);
+    public Trip saveTrip(Trip trip) throws RemoteException {
+        return tripDAO.saveTrip(trip);
     }
 
     @Override
-    public Trip update(String sessionToken, Trip trip) throws RemoteException {
-        User user = getUserBySessionToken(sessionToken);
+    public Trip update(Trip trip) throws RemoteException {
         Trip dbTrip = tripDAO.findById(trip.getTripId());
         if (dbTrip == null) {
             throw new RemoteException("Trip not found.");
         }
-        if (!dbTrip.getUser().getUserId().equals(user.getUserId())) {
-            throw new RemoteException("You are not authorized to update this trip.");
-        }
-        // Optionally: copy updatable fields from input "trip" to "dbTrip"
+        // Update updatable fields
         dbTrip.setTripName(trip.getTripName());
         dbTrip.setStartDate(trip.getStartDate());
         dbTrip.setEndDate(trip.getEndDate());
@@ -74,20 +56,27 @@ public class TripServiceImpl extends UnicastRemoteObject implements TripService 
     }
 
     @Override
-    public Trip delete(String sessionToken, Trip trip) throws RemoteException {
-        User user = getUserBySessionToken(sessionToken);
+    public Trip delete(Trip trip) throws RemoteException {
         Trip dbTrip = tripDAO.findById(trip.getTripId());
         if (dbTrip == null) {
             throw new RemoteException("Trip not found.");
         }
-        if (!dbTrip.getUser().getUserId().equals(user.getUserId())) {
-            throw new RemoteException("You are not authorized to delete this trip.");
-        }
         return tripDAO.delete(dbTrip);
     }
 
-    // For demo/testing: allow adding session tokens (in production, manage this elsewhere)
-    public static void addSessionToken(String token, Long userId) {
-        sessionStore.put(token, userId);
+    @Override
+    public model.TripStats getTripStatsByUser(Long userId) throws RemoteException {
+        User user = userDAO.findById(userId);
+        long planned = tripDAO.countAllByUser(user);
+        long completed = tripDAO.countCompletedByUser(user);
+        long upcoming = tripDAO.countUpcomingByUser(user);
+        return new model.TripStats((int) planned, (int) completed, (int) upcoming);
     }
+
+    @Override
+    public List<Trip> getAllTripsByUser(Long id) throws RemoteException {
+    User user = userDAO.findById(id);
+    if (user == null) return null;
+    return tripDAO.findByUser(user);
+}
 }
