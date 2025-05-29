@@ -49,7 +49,7 @@ public boolean verifyOtp(User user, String code, String purpose) throws RemoteEx
         // If this OTP is for registration, mark the user as verified and persist it
         if ("REGISTER".equalsIgnoreCase(purpose)) {
             user.setVerified(true);
-            userDAO.update(user); // Make sure userDAO.update persists the isVerified flag
+            userDAO.updateUser(user); // Make sure userDAO.update persists the isVerified flag
         }
 
         return true;

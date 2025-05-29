@@ -42,6 +42,9 @@ public class User implements Serializable {
 
     @Column(nullable = false)
     private boolean verified = false;
+    
+    @Column(unique = true)
+    private String sessionToken;
 
     // One-to-Many: User owns many trips
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -62,7 +65,7 @@ public class User implements Serializable {
     public User() {}
 
     public User(Long userId, String firstName, String lastName, String username, String password, String birthdate,
-                String phoneNumber, String gender, String email, boolean verified) {
+                String phoneNumber, String gender, String email, boolean verified, String sessionToken) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -73,6 +76,7 @@ public class User implements Serializable {
         this.gender = gender;
         this.email = email;
         this.verified = verified;
+        this.sessionToken = sessionToken;
     }
 
     public User(Long userId) {
@@ -122,4 +126,7 @@ public class User implements Serializable {
     
     public List<Destination> getDestinations() { return destinations; }
     public void setDestinations(List<Destination> destinations) { this.destinations = destinations; }
+    
+    public String getSessionToken() { return sessionToken; }
+    public void setSessionToken(String sessionToken) { this.sessionToken = sessionToken; }
 }

@@ -26,7 +26,7 @@ public class TripDAO {
         }
     }
 
-    public Trip update(Trip trip) {
+    public Trip updateTrip(Trip trip) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
@@ -42,90 +42,101 @@ public class TripDAO {
         }
     }
 
-    public Trip delete(Trip trip) {
-        Transaction tx = null;
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        try {
-            tx = session.beginTransaction();
-            session.delete(trip);
-            tx.commit();
-            return trip;
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            return null;
-        } finally {
-            session.close();
-        }
-    }
-
-    // Find all trips for a given user
-    public List<Trip> findByUser(User user) {
+    public boolean deleteTrip(Trip trip) {
+    Transaction tx = null;
     Session session = HibernateUtil.getSessionFactory().openSession();
     try {
-        return (List<Trip>) session.createQuery(
+        tx = session.beginTransaction();
+        session.delete(trip);
+        tx.commit();
+        return true;
+    } catch (Exception e) {
+        if (tx != null) tx.rollback();
+        throw e; // Let the service handle and wrap the exception
+    } finally {
+        session.close();
+    }
+}
+
+    // Find all trips for a given user
+    public List<Trip> findTripsByUser(User user) {
+    Session session = HibernateUtil.getSessionFactory().openSession();
+    try {
+        List<Trip> trips = session.createQuery(
                 "select distinct t from Trip t left join fetch t.destinations where t.user.id = :userId")
                 .setParameter("userId", user.getUserId())
                 .list();
+        // Force initialize user for each trip
+        for (Trip trip : trips) {
+            org.hibernate.Hibernate.initialize(trip.getUser());
+        }
+        return trips;
     } finally {
         session.close();
     }
 }
     
     // Find a trip by its id
-    public Trip findById(Long id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        try {
-            return (Trip) session.get(Trip.class, id);
-        } finally {
-            session.close();
+    public Trip findTripById(Long id) {
+    Session session = HibernateUtil.getSessionFactory().openSession();
+    try {
+        Trip trip = (Trip) session.get(Trip.class, id);
+        // Force initialization of destinations and user
+        if (trip != null) {
+            org.hibernate.Hibernate.initialize(trip.getDestinations());
+            org.hibernate.Hibernate.initialize(trip.getUser());
         }
+        return trip;
+    } finally {
+        session.close();
     }
+}
 
-    // Find all trips (admin/global)
-    public List<Trip> findAll() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        try {
-            return (List<Trip>) session.createQuery("from Trip").list();
-        } finally {
-            session.close();
-        }
-    }
-
-    // Count all trips
-    public long countAll() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        try {
-            return (Long) session.createQuery("select count(t) from Trip t").uniqueResult();
-        } finally {
-            session.close();
-        }
-    }
-
-    // Count upcoming trips (any user)
-    public long countUpcoming() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        try {
-            return (Long) session.createQuery(
-                    "select count(t) from Trip t where t.startDate > :now")
-                    .setParameter("now", new Date())
-                    .uniqueResult();
-        } finally {
-            session.close();
-        }
-    }
-
-    // Count completed trips (any user)
-    public long countCompleted() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        try {
-            return (Long) session.createQuery(
-                    "select count(t) from Trip t where t.endDate < :now")
-                    .setParameter("now", new Date())
-                    .uniqueResult();
-        } finally {
-            session.close();
-        }
-    }
+//    // Find all trips (admin/global)
+//    public List<Trip> findAll() {
+//        Session session = HibernateUtil.getSessionFactory().openSession();
+//        try {
+//            return (List<Trip>) session.createQuery("from Trip").list();
+//        } finally {
+//            session.close();
+//        }
+//    }
+//
+//    // Count all trips
+//    public long countAll() {
+//        Session session = HibernateUtil.getSessionFactory().openSession();
+//        try {
+//            return (Long) session.createQuery("select count(t) from Trip t").uniqueResult();
+//        } finally {
+//            session.close();
+//        }
+//    }
+//
+//    // Count upcoming trips (any user)
+//    public long countUpcoming() {
+//        Session session = HibernateUtil.getSessionFactory().openSession();
+//        try {
+//            return (Long) session.createQuery(
+//                    "select count(t) from Trip t where t.startDate > :now")
+//                    .setParameter("now", new Date())
+//                    .uniqueResult();
+//        } finally {
+//            session.close();
+//        }
+//    }
+//
+//    // Count completed trips (any user)
+//    public long countCompleted() {
+//        Session session = HibernateUtil.getSessionFactory().openSession();
+//        try {
+//            return (Long) session.createQuery(
+//                    "select count(t) from Trip t where t.endDate < :now")
+//                    .setParameter("now", new Date())
+//                    .uniqueResult();
+//        } finally {
+//            session.close();
+//        }
+//    }
 
     // Count all trips for a given user
     public long countAllByUser(User user) {

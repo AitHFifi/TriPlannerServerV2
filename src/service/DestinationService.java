@@ -15,10 +15,47 @@ import model.Destination;
 import java.util.List;
 
 public interface DestinationService extends Remote{
-    Destination findById(Long id) throws RemoteException;
-    List<Destination> findAll() throws RemoteException;
-    List<Destination> findAllByUser(Long id) throws RemoteException;
-    boolean save(Destination destination) throws RemoteException;
-    boolean update(Destination destination) throws RemoteException;
-    boolean delete(Destination destination) throws RemoteException;
+    /**
+     * Find a destination by its unique ID.
+     * @param id The destination ID.
+     * @return The Destination object, or null if not found.
+     */
+    Destination findDestinationById(Long id) throws RemoteException;
+
+    /**
+     * Find all destinations (admin/global).
+     * @return List of all destinations in the system.
+     */
+//    List<Destination> findAll() throws RemoteException;
+
+    /**
+     * Find all destinations belonging to the user identified by the session token.
+     * @param sessionToken The session token representing the authenticated user.
+     * @return List of the user's destinations.
+     */
+    List<Destination> findAllDestinationsBySession(String sessionToken) throws RemoteException;
+
+    /**
+     * Save a new destination for the user identified by the session token.
+     * @param sessionToken The session token representing the authenticated user.
+     * @param destination The Destination to save.
+     * @return true if saved successfully, false otherwise.
+     */
+    boolean saveDestinationBySession(String sessionToken, Destination destination) throws RemoteException;
+
+    /**
+     * Update an existing destination for the user identified by the session token.
+     * @param sessionToken The session token representing the authenticated user.
+     * @param destination The updated Destination object.
+     * @return true if updated successfully, false otherwise.
+     */
+    boolean updateDestinationBySession(String sessionToken, Destination destination) throws RemoteException;
+
+    /**
+     * Delete a destination for the user identified by the session token.
+     * @param sessionToken The session token representing the authenticated user.
+     * @param destination The Destination to delete.
+     * @return true if deleted successfully, false otherwise.
+     */
+    boolean deleteDestinationBySession(String sessionToken, Destination destination) throws RemoteException;
 }

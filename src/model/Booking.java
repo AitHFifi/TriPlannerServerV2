@@ -10,6 +10,7 @@ package model;
  * @author Hp
  */
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.*;
 
 @Entity
@@ -31,21 +32,25 @@ public class Booking implements Serializable {
     private Trip trip;
 
     @Column(nullable = false)
-    private String bookingDate;
+    private Date bookingDate;
 
     @Column(nullable = false)
     private double price;
 
     @Column(nullable = false)
     private String status;
+    
+    @Column(nullable = false)
+    private String transportMode;
 
     public Booking() {}
 
-    public Booking(Trip trip, String bookingDate, double price, String status, User user) {
+    public Booking(Trip trip, Date bookingDate, double price, String status, String transportMode, User user) {
         this.trip = trip;
         this.bookingDate = bookingDate;
         this.price = price;
         this.status = status;
+        this.transportMode = transportMode;
         this.user = user;
     }
 
@@ -56,8 +61,8 @@ public class Booking implements Serializable {
     public Trip getTrip() { return trip; }
     public void setTrip(Trip trip) { this.trip = trip; }
 
-    public String getBookingDate() { return bookingDate; }
-    public void setBookingDate(String bookingDate) { this.bookingDate = bookingDate; }
+    public Date getBookingDate() { return bookingDate; }
+    public void setBookingDate(Date bookingDate) { this.bookingDate = bookingDate; }
 
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
@@ -67,4 +72,7 @@ public class Booking implements Serializable {
     
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+    
+    public String getTransportMode() { return transportMode; }
+    public void setTransportMode(String transportMode) { this.transportMode = transportMode;}
 }

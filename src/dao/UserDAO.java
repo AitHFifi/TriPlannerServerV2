@@ -13,24 +13,10 @@ import model.User;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.Query; 
-import java.util.List;
 
 public class UserDAO {
-
-    public User findById(Long id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        User user = (User) session.get(User.class, id);
-        session.close();
-        return user;
-    }
-
-    public List<User> findAll() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        List<User> list = session.createQuery("from User").list();
-        session.close();
-        return list;
-    }
-
+    
+    // Register a User 
     public boolean saveUser(User user) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction tx = null;
@@ -47,7 +33,8 @@ public class UserDAO {
         }
     }
 
-    public boolean update(User user) {
+    // Update a User 
+    public boolean updateUser(User user) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction tx = null;
         try {
@@ -63,7 +50,8 @@ public class UserDAO {
         }
     }
 
-    public boolean delete(User user) {
+    // Delete a User
+    public boolean deleteUser(User user) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction tx = null;
         try {
@@ -79,6 +67,7 @@ public class UserDAO {
         }
     }
 
+    // Find user by Username
     public User findByUsername(String username) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Query query = session.createQuery("from User where username = :username");
@@ -88,6 +77,7 @@ public class UserDAO {
         return user;
     }
 
+    // Find user by email
     public User findByEmail(String email) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Query query = session.createQuery("from User where email = :email");
@@ -124,6 +114,20 @@ public class UserDAO {
         query.setParameter("phoneNumber", phoneNumber);
         User user = (User) query.uniqueResult();
         session.close();
+        return user;
+    }
+    
+    // Find user by SessionToken
+    public User findBySessionToken(String sessionToken) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        User user = null;
+        try {
+            Query query = session.createQuery("from User where sessionToken = :sessionToken");
+            query.setParameter("sessionToken", sessionToken);
+            user = (User) query.uniqueResult();
+        } finally {
+            session.close();
+        }
         return user;
     }
 }

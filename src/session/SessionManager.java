@@ -9,6 +9,7 @@ package session;
  *
  * @author Hp
  */
+import dao.UserDAO;
 import model.User;
 import java.util.Map;
 import java.util.UUID;
@@ -20,6 +21,8 @@ public class SessionManager {
     // Generate a session, store it, and return token
     public static String createSession(User user) {
         String token = UUID.randomUUID().toString();
+        user.setSessionToken(token);
+        new UserDAO().updateUser(user); // Persist the session token in the DB
         sessionMap.put(token, user);
         return token;
     }
@@ -29,7 +32,11 @@ public class SessionManager {
     }
 
     public static void invalidateSession(String token) {
-        sessionMap.remove(token);
+        User user = sessionMap.remove(token);
+        if (user != null) {
+            user.setSessionToken(null);
+            new UserDAO().updateUser(user); // Clear the session token in the DB
+        }
     }
 
     public static boolean isValid(String token) {

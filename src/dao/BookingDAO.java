@@ -13,24 +13,59 @@ import model.Booking;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import java.util.List;
+import model.User;
+import org.hibernate.Hibernate;
 
 public class BookingDAO {
 
-    public Booking findById(Long id) {
+    // Find all bookings by user
+    public List<Booking> findBookingsByUser(User user) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Booking booking = (Booking) session.get(Booking.class, id);
-        session.close();
-        return booking;
+        try {
+            List<Booking> bookings = session.createQuery(
+                    "select b from Booking b where b.user.userId = :userId")
+                    .setParameter("userId", user.getUserId())
+                    .list();
+            // Initialize references to avoid LazyInitializationException
+            for (Booking booking : bookings) {
+                if (booking.getTrip() != null) {
+                    Hibernate.initialize(booking.getTrip());
+                }
+            }
+            return bookings;
+        } finally {
+            session.close();
+        }
     }
 
-    public List<Booking> findAll() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        List<Booking> list = session.createQuery("from Booking").list();
-        session.close();
-        return list;
-    }
 
-    public boolean save(Booking booking) {
+    // Find booking by its ID
+    public Booking findBookingById(Long id) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            Booking booking = (Booking) session.get(Booking.class, id);
+            if (booking != null) {
+                // Initialize Trip and User references if needed
+                if (booking.getTrip() != null) {
+                    Hibernate.initialize(booking.getTrip());
+                    if (booking.getTrip().getUser() != null) {
+                        Hibernate.initialize(booking.getTrip().getUser());
+                    }
+                }
+            }
+            return booking;
+        } finally {
+            session.close();
+        }
+    }
+//    public List<Booking> findAll() {
+//        Session session = HibernateUtil.getSessionFactory().openSession();
+//        List<Booking> list = session.createQuery("from Booking").list();
+//        session.close();
+//        return list;
+//    }
+
+    public boolean saveBooking(Booking booking) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
@@ -40,13 +75,14 @@ public class BookingDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
+            e.printStackTrace();
             return false;
         } finally {
             session.close();
         }
     }
 
-    public boolean update(Booking booking) {
+    public boolean updateBooking(Booking booking) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
@@ -62,35 +98,52 @@ public class BookingDAO {
         }
     }
 
-    public boolean delete(Booking booking) {
+    public boolean deleteBooking(Booking booking) {
         Transaction tx = null;
+    Session session = HibernateUtil.getSessionFactory().openSession();
+    try {
+        tx = session.beginTransaction();
+        session.delete(booking);
+        session.flush();
+        tx.commit();
+        return true;
+    } catch (org.hibernate.exception.ConstraintViolationException cve) {
+        if (tx != null) tx.rollback();
+        System.err.println("Constraint violation: " + cve.getMessage());
+        return false;
+    } catch (Exception e) {
+        if (tx != null) tx.rollback();
+        e.printStackTrace();
+        return false;
+    } finally {
+        session.close();
+    }
+    }
+    
+    // Count all bookings by user
+    public long countAllBookingByUser(User user) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
-            tx = session.beginTransaction();
-            session.delete(booking);
-            tx.commit();
-            return true;
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            return false;
+            return (Long) session.createQuery(
+                    "select count(b) from Booking b where b.trip.user.userId = :userId")
+                    .setParameter("userId", user.getUserId())
+                    .uniqueResult();
         } finally {
             session.close();
         }
     }
-    
-    public long countAll() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        long count = (Long) session.createQuery("select count(b) from Booking b").uniqueResult();
-        session.close();
-        return count;
-    }
 
-    public long countPending() {
+    // Count pending bookings by user
+    public long countPendingBookingByUser(User user) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        long count = (Long) session.createQuery("select count(b) from Booking b where b.status = :status")
-                                  .setParameter("status", "pending")
-                                  .uniqueResult();
-        session.close();
-        return count;
+        try {
+            return (Long) session.createQuery(
+                    "select count(b) from Booking b where b.trip.user.userId = :userId and lower(b.status) = :status")
+                    .setParameter("userId", user.getUserId())
+                    .setParameter("status", "pending")
+                    .uniqueResult();
+        } finally {
+            session.close();
+        }
     }
 }

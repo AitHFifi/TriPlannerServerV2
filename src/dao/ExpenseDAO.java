@@ -1,14 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package dao;
 
-/**
- *
- * @author Hp
- */
 import model.Expense;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -16,21 +7,30 @@ import java.util.List;
 
 public class ExpenseDAO {
 
-    public Expense findById(Long id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Expense expense = (Expense) session.get(Expense.class, id);
+    public Expense findExpenseById(Long id) {
+    Session session = HibernateUtil.getSessionFactory().openSession();
+    try {
+        // Use JOIN FETCH to load the user eagerly
+        return (Expense) session.createQuery(
+            "select e from Expense e join fetch e.user where e.expenseId = :id"
+        )
+        .setParameter("id", id)
+        .uniqueResult();
+    } finally {
         session.close();
-        return expense;
     }
+}
 
-    public List<Expense> findAll() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        List<Expense> list = session.createQuery("from Expense").list();
-        session.close();
-        return list;
-    }
+    public List<Expense> findAllExpensesByUser(Long userId) {
+    Session session = HibernateUtil.getSessionFactory().openSession();
+    List<Expense> list = session.createQuery(
+        "select e from Expense e join fetch e.trip where e.user.userId = :userId"
+    ).setParameter("userId", userId).list();
+    session.close();
+    return list;
+}
 
-    public boolean save(Expense expense) {
+    public boolean saveExpense(Expense expense) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
@@ -46,7 +46,7 @@ public class ExpenseDAO {
         }
     }
 
-    public boolean update(Expense expense) {
+    public boolean updateExpense(Expense expense) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
@@ -56,13 +56,14 @@ public class ExpenseDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
+            e.printStackTrace();
             return false;
         } finally {
             session.close();
         }
     }
 
-    public boolean delete(Expense expense) {
+    public boolean deleteExpense(Expense expense) {
         Transaction tx = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
         try {
@@ -72,44 +73,54 @@ public class ExpenseDAO {
             return true;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
+            e.printStackTrace();
             return false;
         } finally {
             session.close();
         }
     }
 
-    public List<Expense> findByExpenseType(String expenseType) {
+    // Find all expenses by category (for a user)
+    public List<Expense> findExpensesByCategory(Long userId, String category) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        List<Expense> list = session.createQuery("from Expense where expenseType = :expenseType")
-                                    .setParameter("expenseType", expenseType)
+        List<Expense> list = session.createQuery("from Expense where user.userId = :userId and category = :category")
+                                    .setParameter("userId", userId)
+                                    .setParameter("category", category)
                                     .list();
         session.close();
         return list;
     }
 
-    // New: Find all expenses for a specific trip
-    public List<Expense> findByTrip(String tripId) {
+    // Find all expenses for a specific trip (for a user)
+    public List<Expense> findExpensesByTrip(Long userId, Long tripId) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        List<Expense> list = session.createQuery("from Expense where trip.tripId = :tripId")
+        List<Expense> list = session.createQuery("from Expense where user.userId = :userId and trip.tripId = :tripId")
+                                    .setParameter("userId", userId)
                                     .setParameter("tripId", tripId)
                                     .list();
         session.close();
         return list;
     }
 
-    // New: Sum all expenses for a specific trip
-    public double sumExpensesByTrip(String tripId) {
+    // Sum all expenses for a specific trip (for a user)
+    public double sumExpensesByTrip(Long userId, Long tripId) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Double sum = (Double) session.createQuery("select sum(amount) from Expense where trip.tripId = :tripId")
-                                     .setParameter("tripId", tripId)
-                                     .uniqueResult();
+        Double sum = (Double) session.createQuery(
+            "select sum(amount) from Expense where user.userId = :userId and trip.tripId = :tripId")
+            .setParameter("userId", userId)
+            .setParameter("tripId", tripId)
+            .uniqueResult();
         session.close();
         return sum != null ? sum : 0.0;
     }
-    
-    public double sumAll() {
+
+    // Sum all expenses (for a user)
+    public double sumAllExpenses(Long userId) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        Double sum = (Double) session.createQuery("select sum(e.amount) from Expense e").uniqueResult();
+        Double sum = (Double) session.createQuery(
+            "select sum(e.amount) from Expense e where e.user.userId = :userId")
+            .setParameter("userId", userId)
+            .uniqueResult();
         session.close();
         return sum != null ? sum : 0.0;
     }

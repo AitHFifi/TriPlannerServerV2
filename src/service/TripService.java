@@ -16,11 +16,21 @@ import model.Trip;
 import java.util.List;
 
 public interface TripService extends Remote{
-    Trip findTripByUser(Long id) throws RemoteException; 
-    List<Trip> getAllTripsByUser(Long id) throws RemoteException;
-    List<Trip> findAll() throws RemoteException;
-    Trip saveTrip(Trip trip) throws RemoteException;
-    Trip update(Trip trip) throws RemoteException;
-    Trip delete(Trip trip) throws RemoteException;
-    TripStats getTripStatsByUser(Long userId) throws RemoteException;
+    // Returns all trips for the authenticated user (via session token)
+    List<Trip> getAllTripsBySession(String sessionToken) throws RemoteException;
+
+    // Returns all trips in the system (admin/global)
+    // List<Trip> findAll() throws RemoteException;
+
+    // Saves a new trip for the authenticated user
+    Trip saveTrip(String sessionToken, Trip trip) throws RemoteException;
+
+    // Updates an existing trip for the authenticated user
+    Trip updateTrip(String sessionToken, Trip trip) throws RemoteException;
+
+    // Deletes a trip for the authenticated user
+    boolean deleteTrip(String sessionToken, Trip trip) throws RemoteException;
+
+    // Returns trip statistics for the authenticated user
+    TripStats getTripStatsBySession(String sessionToken) throws RemoteException;
 }

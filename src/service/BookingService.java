@@ -13,11 +13,24 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import model.Booking;
 import java.util.List;
+import model.BookingStats;
 
 public interface BookingService extends Remote {
-    Booking findById(Long id) throws RemoteException;
-    List<Booking> findAll() throws RemoteException;
-    boolean save(Booking booking) throws RemoteException;
-    boolean update(Booking booking) throws RemoteException;
-    boolean delete(Booking booking) throws RemoteException;
+    // Returns all trips for the authenticated user (via session token)
+    List<Booking> getAllBookingsBySession(String sessionToken) throws RemoteException;
+
+    // Returns all trips in the system (admin/global)
+    // List<Booking> findAll() throws RemoteException;
+
+    // Saves a new trip for the authenticated user
+    Booking saveBooking(String sessionToken, Booking booking) throws RemoteException;
+
+    // Updates an existing trip for the authenticated user
+    Booking updateBooking(String sessionToken, Booking booking) throws RemoteException;
+
+    // Deletes a trip for the authenticated user
+    Booking deleteBooking(String sessionToken, Booking booking) throws RemoteException;
+    
+    // Returns booking statistics for the authenticated user
+    BookingStats getBookingStatsBySession(String sessionToken) throws RemoteException;
 }
