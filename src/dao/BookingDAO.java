@@ -38,7 +38,6 @@ public class BookingDAO {
         }
     }
 
-
     // Find booking by its ID
     public Booking findBookingById(Long id) {
         Session session = HibernateUtil.getSessionFactory().openSession();
@@ -146,4 +145,25 @@ public class BookingDAO {
             session.close();
         }
     }
+    
+    public List<Booking> findBookingsByTrip(Long userId, Long tripId) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            List<Booking> bookings = session.createQuery(
+                    "select b from Booking b where b.user.userId = :userId and b.trip.tripId = :tripId")
+                    .setParameter("userId", userId)
+                    .setParameter("tripId", tripId)
+                    .list();
+            // Initialize references to avoid LazyInitializationException
+            for (Booking booking : bookings) {
+                if (booking.getTrip() != null) {
+                    Hibernate.initialize(booking.getTrip());
+                }
+            }
+            return bookings;
+        } finally {
+            session.close();
+        }
+    }
+    
 }

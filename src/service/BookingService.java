@@ -33,4 +33,7 @@ public interface BookingService extends Remote {
     
     // Returns booking statistics for the authenticated user
     BookingStats getBookingStatsBySession(String sessionToken) throws RemoteException;
+    
+    // Returns all bookings for a specific trip (for the current user/session)
+    List<Booking> getAllBookingsByTrip(String sessionToken, Long tripId) throws RemoteException;
 }

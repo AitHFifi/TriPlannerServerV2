@@ -109,5 +109,11 @@ public boolean deleteTrip(String sessionToken, Trip trip) throws RemoteException
         long upcoming = tripDAO.countUpcomingByUser(user);
         return new TripStats((int) planned, (int) completed, (int) upcoming);
     }
+
+    @Override
+    public List<Trip> getAllTripsWithDetailsBySession(String sessionToken) throws RemoteException {
+    User user = getUserBySessionToken(sessionToken);
+    return tripDAO.findTripsWithDetailsByUser(user);
+}
     
 }

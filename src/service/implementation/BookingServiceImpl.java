@@ -87,4 +87,10 @@ public class BookingServiceImpl extends UnicastRemoteObject implements BookingSe
         long upcoming = bookingDAO.countPendingBookingByUser(user);
         return new BookingStats((int) planned, (int) upcoming);
     }
+
+        @Override
+    public List<Booking> getAllBookingsByTrip(String sessionToken, Long tripId) throws RemoteException {
+        User user = getUserBySessionToken(sessionToken);
+        return bookingDAO.findBookingsByTrip(user.getUserId(), tripId);
+    }
 }

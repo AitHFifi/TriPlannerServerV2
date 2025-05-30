@@ -178,4 +178,32 @@ public class TripDAO {
             session.close();
         }
     }
+    
+    // Find all trips for a given user, INCLUDING expenses, booking, and destinations (eager fetch)
+    public List<Trip> findTripsWithDetailsByUser(User user) {
+    Session session = HibernateUtil.getSessionFactory().openSession();
+    try {
+        // Only fetch one collection in the main query!
+        List<Trip> trips = session.createQuery(
+                "select distinct t from Trip t " +
+                "left join fetch t.destinations " +
+                "left join fetch t.booking " +
+                "where t.user.userId = :userId")
+            .setParameter("userId", user.getUserId())
+            .list();
+        for (Trip trip : trips) {
+            org.hibernate.Hibernate.initialize(trip.getExpenses()); // separate query per trip!
+            org.hibernate.Hibernate.initialize(trip.getUser());
+            if (trip.getBooking() != null) {
+                org.hibernate.Hibernate.initialize(trip.getBooking().getUser());
+            }
+            if (trip.getExpenses() != null) {
+                trip.getExpenses().forEach(exp -> org.hibernate.Hibernate.initialize(exp.getUser()));
+            }
+        }
+        return trips;
+    } finally {
+        session.close();
+    }
+}
 }
