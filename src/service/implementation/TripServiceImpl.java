@@ -116,4 +116,9 @@ public boolean deleteTrip(String sessionToken, Trip trip) throws RemoteException
     return tripDAO.findTripsWithDetailsByUser(user);
 }
     
+    @Override
+public List<Trip> findTripsByName(String sessionToken, String name) throws RemoteException {
+    User user = getUserBySessionToken(sessionToken);
+    return tripDAO.findTripsByName(user.getUserId(), name);
+}
 }

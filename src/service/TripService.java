@@ -36,4 +36,6 @@ public interface TripService extends Remote{
     
     // Returns all trips for the authenticated user with all details, for export
     List<Trip> getAllTripsWithDetailsBySession(String sessionToken) throws RemoteException;
+    
+    List<Trip> findTripsByName(String sessionToken, String name) throws Exception;
 }

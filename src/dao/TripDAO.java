@@ -206,4 +206,18 @@ public class TripDAO {
         session.close();
     }
 }
+    
+    public List<Trip> findTripsByName(Long userId, String name) {
+    Session session = HibernateUtil.getSessionFactory().openSession();
+    try {
+        return session.createQuery(
+                "from Trip t where t.user.userId = :userId and lower(t.tripName) like :name"
+            )
+            .setParameter("userId", userId)
+            .setParameter("name", "%" + name.toLowerCase() + "%")
+            .list();
+    } finally {
+        session.close();
+    }
+}
 }
