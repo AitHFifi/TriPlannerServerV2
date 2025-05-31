@@ -25,6 +25,6 @@ public interface UserService extends Remote{
     boolean isUsernameTaken(String username) throws RemoteException;
     boolean isEmailTaken(String email) throws RemoteException;
     boolean isPhoneNumberTaken(String phoneNumber) throws RemoteException;
-    boolean requestOtpForUserChange(String sessionToken, String actionType) throws RemoteException;
+    boolean requestOtpForUserChange(String sessionToken, String actionType, String newPhoneNumber) throws RemoteException;
     boolean updateUser(String sessionToken, User user, String otp) throws RemoteException;
 }

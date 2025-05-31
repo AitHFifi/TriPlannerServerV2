@@ -29,16 +29,19 @@ public class OtpServiceImpl extends UnicastRemoteObject implements OtpService {
     public OtpServiceImpl() throws RemoteException {}
 
     @Override
-    public boolean generateAndSendOtp(User user, String purpose) throws RemoteException {
-        String code = OtpUtil.generateSixDigitOtp();
-        Otp otp = new Otp(code, LocalDateTime.now().plusMinutes(5), false, purpose, user);
-        boolean saved = otpDAO.save(otp);
-        if (saved) {
-            // Use email utility to send the OTP
-            EmailUtil.sendOtpEmail(user.getEmail(), code);
+public boolean generateAndSendOtp(User user, String purpose) throws RemoteException {
+    String code = OtpUtil.generateSixDigitOtp();
+    Otp otp = new Otp(code, LocalDateTime.now().plusMinutes(5), false, purpose, user);
+    boolean saved = otpDAO.save(otp);
+    if (saved) {
+        if ("PHONE".equalsIgnoreCase(purpose) && user.getPhoneNumber() != null) {
+            util.SmsUtil.sendOtpSms(user.getPhoneNumber(), code); // <-- Now sends SMS!
+        } else {
+            util.EmailUtil.sendOtpEmail(user.getEmail(), code);
         }
-        return saved;
     }
+    return saved;
+}
 
    @Override
 public boolean verifyOtp(User user, String code, String purpose) throws RemoteException {

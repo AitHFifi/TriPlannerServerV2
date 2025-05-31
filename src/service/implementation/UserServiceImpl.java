@@ -115,74 +115,90 @@ public User register(User user) throws RemoteException {
     }
 
     @Override
-    public boolean requestOtpForUserChange(String sessionToken, String actionType) throws RemoteException {
-        User user = SessionManager.getUser(sessionToken);
-        if (user == null) {
-            throw new RemoteException("Invalid session. Please login again.");
+public boolean requestOtpForUserChange(String sessionToken, String actionType, String newPhoneNumber) throws RemoteException {
+    User user = SessionManager.getUser(sessionToken);
+    if (user == null) {
+        throw new RemoteException("Invalid session. Please login again.");
+    }
+    try {
+        OtpService otpService = (OtpService) Naming.lookup("rmi://127.0.0.1:5000/otp");
+        // Temporarily set the new phone number for OTP purpose only
+        if ("PHONE".equalsIgnoreCase(actionType) && newPhoneNumber != null && !newPhoneNumber.isEmpty()) {
+            User tempUser = new User();
+            tempUser.setUserId(user.getUserId());
+            tempUser.setUsername(user.getUsername());
+            tempUser.setFirstName(user.getFirstName());
+            tempUser.setLastName(user.getLastName());
+            tempUser.setEmail(user.getEmail());
+            tempUser.setPhoneNumber(newPhoneNumber); // Use new phone number here
+            tempUser.setGender(user.getGender());
+            tempUser.setBirthdate(user.getBirthdate());
+            tempUser.setVerified(user.isVerified());
+            return otpService.generateAndSendOtp(tempUser, actionType);
+        } else {
+            return otpService.generateAndSendOtp(user, actionType);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        throw new RemoteException("Failed to generate/send OTP.", e);
+    }
+}
+
+    @Override
+public boolean updateUser(String sessionToken, User user, String otp) throws RemoteException {
+    User currentUser = SessionManager.getUser(sessionToken);
+    if (currentUser == null || !currentUser.getUserId().equals(user.getUserId())) {
+        throw new RemoteException("Unauthorized or invalid session.");
+    }
+
+    // Determine if OTP verification is required and, if so, for which action
+    String actionType = null;
+    boolean criticalChange = false;
+
+    if (!user.getEmail().equals(currentUser.getEmail())) {
+        actionType = "EMAIL";
+        criticalChange = true;
+    } else if (user.getPassword() != null && !user.getPassword().isEmpty()
+            && !BCrypt.checkpw(user.getPassword(), currentUser.getPassword())) {
+        actionType = "PASSWORD";
+        criticalChange = true;
+    } else if (!user.getPhoneNumber().equals(currentUser.getPhoneNumber())) {
+        actionType = "PHONE";
+        criticalChange = true;
+    }
+
+    // If OTP is required, verify it
+    if (criticalChange) {
+        if (otp == null || otp.isEmpty()) {
+            throw new RemoteException("OTP required for critical changes.");
         }
         try {
             OtpService otpService = (OtpService) Naming.lookup("rmi://127.0.0.1:5000/otp");
-            // The service now returns boolean
-            return otpService.generateAndSendOtp(user, actionType);
+            boolean valid = otpService.verifyOtp(currentUser, otp, actionType);
+            if (!valid) {
+                return false;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RemoteException("Failed to generate/send OTP.", e);
+            throw new RemoteException("Failed to verify OTP.", e);
         }
     }
 
-
-    @Override
-    public boolean updateUser(String sessionToken, User user, String otp) throws RemoteException {
-        User currentUser = SessionManager.getUser(sessionToken);
-        if (currentUser == null || !currentUser.getUserId().equals(user.getUserId())) {
-            throw new RemoteException("Unauthorized or invalid session.");
-        }
-
-        // Determine if OTP verification is required and, if so, for which action
-        String actionType = null;
-        boolean criticalChange = false;
-
-        if (!user.getEmail().equals(currentUser.getEmail())) {
-            actionType = "EMAIL";
-            criticalChange = true;
-        } else if (user.getPassword() != null && !user.getPassword().isEmpty()
-                && !BCrypt.checkpw(user.getPassword(), currentUser.getPassword())) {
-            actionType = "PASSWORD";
-            criticalChange = true;
-        }
-
-        // If OTP is required, verify it
-        if (criticalChange) {
-            if (otp == null || otp.isEmpty()) {
-                throw new RemoteException("OTP required for critical changes.");
-            }
-            try {
-                OtpService otpService = (OtpService) Naming.lookup("rmi://127.0.0.1:5000/otp");
-                boolean valid = otpService.verifyOtp(currentUser, otp, actionType);
-                if (!valid) {
-                    return false;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RemoteException("Failed to verify OTP.", e);
-            }
-        }
-
-        // For password update, hash the password if it is being changed
-        if (user.getPassword() != null && !user.getPassword().isEmpty()
-                && !BCrypt.checkpw(user.getPassword(), currentUser.getPassword())) {
-            String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-            currentUser.setPassword(hashed);
-        }
-
-        // Only allow permitted fields to be updated
-        currentUser.setUsername(user.getUsername());
-        currentUser.setEmail(user.getEmail());
-        currentUser.setPhoneNumber(user.getPhoneNumber());
-
-        // Update in DB
-        return userDAO.updateUser(currentUser);
+    // For password update, hash the password if it is being changed
+    if (user.getPassword() != null && !user.getPassword().isEmpty()
+            && !BCrypt.checkpw(user.getPassword(), currentUser.getPassword())) {
+        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        currentUser.setPassword(hashed);
     }
+
+    // Only allow permitted fields to be updated
+    currentUser.setUsername(user.getUsername());
+    currentUser.setEmail(user.getEmail());
+    currentUser.setPhoneNumber(user.getPhoneNumber());
+
+    // Update in DB
+    return userDAO.updateUser(currentUser);
+}
 }
 
 
