@@ -1,14 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package service.implementation;
 
-/**
- *
- * @author Hp
- */
 import dao.UserDAO;
 import java.rmi.Naming;
 import model.User;
@@ -31,8 +22,8 @@ public class UserServiceImpl extends UnicastRemoteObject implements UserService 
     public boolean update(User user) throws RemoteException {
         return userDAO.updateUser(user);
     }
-    
-       @Override
+
+    @Override
     public User findByUsername(String username) throws RemoteException {
         return userDAO.findByUsername(username);
     }
@@ -43,22 +34,22 @@ public class UserServiceImpl extends UnicastRemoteObject implements UserService 
     }
 
     @Override
-public User register(User user) throws RemoteException {
-    user.setVerified(false);
-    boolean saved = userDAO.saveUser(user);
-    if (saved) {
-        try {
-            OtpService otpService = (OtpService) Naming.lookup("rmi://127.0.0.1:5000/otp");
-            otpService.generateAndSendOtp(user, "REGISTER"); 
-        } catch (Exception e) {
-            throw new RemoteException("Failed to generate/send OTP", e);
+    public User register(User user) throws RemoteException {
+        user.setVerified(false);
+        boolean saved = userDAO.saveUser(user);
+        if (saved) {
+            try {
+                OtpService otpService = (OtpService) Naming.lookup("rmi://127.0.0.1:5000/otp");
+                otpService.generateAndSendOtp(user, "REGISTER");
+            } catch (Exception e) {
+                throw new RemoteException("Failed to generate/send OTP", e);
+            }
+            return user;
         }
-        return user;
+        return null;
     }
-    return null;
-} 
-    
-@Override
+
+    @Override
     public String login(String identifier, String password) throws RemoteException {
         User user = null;
         // Check if identifier looks like an email
@@ -94,11 +85,6 @@ public User register(User user) throws RemoteException {
         return false;
     }
 
-//    @Override
-//    public boolean update(String sessionToken, User user) throws RemoteException {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-
     @Override
     public boolean isUsernameTaken(String username) throws RemoteException {
         return userDAO.findByExistingUsername(username) != null;
@@ -115,36 +101,35 @@ public User register(User user) throws RemoteException {
     }
 
     @Override
-public boolean requestOtpForUserChange(String sessionToken, String actionType, String newPhoneNumber) throws RemoteException {
-    User user = SessionManager.getUser(sessionToken);
-    if (user == null) {
-        throw new RemoteException("Invalid session. Please login again.");
-    }
-    try {
-        OtpService otpService = (OtpService) Naming.lookup("rmi://127.0.0.1:5000/otp");
-        // Temporarily set the new phone number for OTP purpose only
-        if ("PHONE".equalsIgnoreCase(actionType) && newPhoneNumber != null && !newPhoneNumber.isEmpty()) {
-            User tempUser = new User();
-            tempUser.setUserId(user.getUserId());
-            tempUser.setUsername(user.getUsername());
-            tempUser.setFirstName(user.getFirstName());
-            tempUser.setLastName(user.getLastName());
-            tempUser.setEmail(user.getEmail());
-            tempUser.setPhoneNumber(newPhoneNumber); // Use new phone number here
-            tempUser.setGender(user.getGender());
-            tempUser.setBirthdate(user.getBirthdate());
-            tempUser.setVerified(user.isVerified());
-            return otpService.generateAndSendOtp(tempUser, actionType);
-        } else {
-            return otpService.generateAndSendOtp(user, actionType);
+    public boolean requestOtpForUserChange(String sessionToken, String actionType, String newPhoneNumber) throws RemoteException {
+        User user = SessionManager.getUser(sessionToken);
+        if (user == null) {
+            throw new RemoteException("Invalid session. Please login again.");
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-        throw new RemoteException("Failed to generate/send OTP.", e);
+        try {
+            OtpService otpService = (OtpService) Naming.lookup("rmi://127.0.0.1:5000/otp");
+            // Temporarily set the new phone number for OTP purpose only
+            if ("PHONE".equalsIgnoreCase(actionType) && newPhoneNumber != null && !newPhoneNumber.isEmpty()) {
+                User tempUser = new User();
+                tempUser.setUserId(user.getUserId());
+                tempUser.setUsername(user.getUsername());
+                tempUser.setFirstName(user.getFirstName());
+                tempUser.setLastName(user.getLastName());
+                tempUser.setEmail(user.getEmail());
+                tempUser.setPhoneNumber(newPhoneNumber); // Use new phone number here
+                tempUser.setGender(user.getGender());
+                tempUser.setBirthdate(user.getBirthdate());
+                tempUser.setVerified(user.isVerified());
+                return otpService.generateAndSendOtp(tempUser, actionType);
+            } else {
+                return otpService.generateAndSendOtp(user, actionType);
+            }
+        } catch (Exception e) {
+            throw new RemoteException("Failed to generate/send OTP.", e);
+        }
     }
-}
 
-    @Override
+@Override
 public boolean updateUser(String sessionToken, User user, String otp) throws RemoteException {
     User currentUser = SessionManager.getUser(sessionToken);
     if (currentUser == null || !currentUser.getUserId().equals(user.getUserId())) {
@@ -174,12 +159,27 @@ public boolean updateUser(String sessionToken, User user, String otp) throws Rem
         }
         try {
             OtpService otpService = (OtpService) Naming.lookup("rmi://127.0.0.1:5000/otp");
-            boolean valid = otpService.verifyOtp(currentUser, otp, actionType);
+            User userForOtp = currentUser;
+            if ("PHONE".equalsIgnoreCase(actionType)) {
+                // Use user object with new phone number for OTP verification
+                userForOtp = new User();
+                userForOtp.setUserId(currentUser.getUserId());
+                userForOtp.setUsername(currentUser.getUsername());
+                userForOtp.setFirstName(currentUser.getFirstName());
+                userForOtp.setLastName(currentUser.getLastName());
+                userForOtp.setEmail(currentUser.getEmail());
+                userForOtp.setPhoneNumber(user.getPhoneNumber());
+                userForOtp.setGender(currentUser.getGender());
+                userForOtp.setBirthdate(currentUser.getBirthdate());
+                userForOtp.setVerified(currentUser.isVerified());
+            }
+            System.out.println("Verifying OTP for userId=" + currentUser.getUserId() +
+                   ", phone=" + currentUser.getPhoneNumber() + ", purpose=" + actionType);
+            boolean valid = otpService.verifyOtp(userForOtp, otp, actionType);
             if (!valid) {
                 return false;
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RemoteException("Failed to verify OTP.", e);
         }
     }
@@ -200,5 +200,3 @@ public boolean updateUser(String sessionToken, User user, String otp) throws Rem
     return userDAO.updateUser(currentUser);
 }
 }
-
-

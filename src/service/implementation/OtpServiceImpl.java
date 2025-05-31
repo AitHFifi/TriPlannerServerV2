@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package service.implementation;
 
 /**
@@ -29,34 +24,40 @@ public class OtpServiceImpl extends UnicastRemoteObject implements OtpService {
     public OtpServiceImpl() throws RemoteException {}
 
     @Override
-public boolean generateAndSendOtp(User user, String purpose) throws RemoteException {
-    String code = OtpUtil.generateSixDigitOtp();
-    Otp otp = new Otp(code, LocalDateTime.now().plusMinutes(5), false, purpose, user);
-    boolean saved = otpDAO.save(otp);
-    if (saved) {
-        if ("PHONE".equalsIgnoreCase(purpose) && user.getPhoneNumber() != null) {
-            util.SmsUtil.sendOtpSms(user.getPhoneNumber(), code); // <-- Now sends SMS!
-        } else {
-            util.EmailUtil.sendOtpEmail(user.getEmail(), code);
+    public boolean generateAndSendOtp(User user, String purpose) throws RemoteException {
+        String code = OtpUtil.generateSixDigitOtp();
+        Otp otp = new Otp(code, LocalDateTime.now().plusMinutes(5), false, purpose, user);
+        boolean saved = otpDAO.save(otp);
+        if (saved) {
+            try {
+                if ("PHONE".equalsIgnoreCase(purpose) && user.getPhoneNumber() != null) {
+                    util.SmsUtil.sendOtpSms(user.getPhoneNumber(), code); // <-- Now sends SMS!
+                } else {
+                    util.EmailUtil.sendOtpEmail(user.getEmail(), code);
+                }
+            } catch (Exception e) {
+                // Log the real error for server debugging (optional: replace with a logger)
+                e.printStackTrace();
+                // Throw a safe, generic remote exception
+                throw new RemoteException("Failed to send OTP. Please try again later.");
+            }
         }
+        return saved;
     }
-    return saved;
-}
 
-   @Override
-public boolean verifyOtp(User user, String code, String purpose) throws RemoteException {
-    Otp otp = otpDAO.findValidOtpByUserAndPurpose(user, code, purpose);
-    if (otp != null) {
-        otpDAO.markOtpAsUsed(otp);
+    @Override
+    public boolean verifyOtp(User user, String code, String purpose) throws RemoteException {
+        Otp otp = otpDAO.findValidOtpByUserAndPurpose(user, code, purpose);
+        if (otp != null) {
+            otpDAO.markOtpAsUsed(otp);
 
-        // If this OTP is for registration, mark the user as verified and persist it
-        if ("REGISTER".equalsIgnoreCase(purpose)) {
-            user.setVerified(true);
-            userDAO.updateUser(user); // Make sure userDAO.update persists the isVerified flag
+            // If this OTP is for registration, mark the user as verified and persist it
+            if ("REGISTER".equalsIgnoreCase(purpose)) {
+                user.setVerified(true);
+                userDAO.updateUser(user); // Make sure userDAO.update persists the isVerified flag
+            }
+            return true;
         }
-
-        return true;
+        return false;
     }
-    return false;
-}
 }
